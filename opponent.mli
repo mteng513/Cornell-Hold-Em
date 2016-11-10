@@ -3,7 +3,7 @@
  * to deceive the player. It will still use the Player
  * interface. *)
 
-module type opponent : player = sig 
+module type Opponent : Player = sig 
 
 	(* Identifier for the user set difficulty. *)
 	type difficulty

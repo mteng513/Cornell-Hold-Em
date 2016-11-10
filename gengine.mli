@@ -3,7 +3,7 @@
  * It is entirely possible that this (and others) interface will
  * be modified heavily *)
 
-module type game_engine = sig
+module type Game_Engine = sig
 
 	(* Card type for the engine *)
 	type card
@@ -36,7 +36,7 @@ module type game_engine = sig
 		4. Current game state
 		5. Number of players
 	*) 
-	type state 
+	type global_state 
 
 
 	(* Switch function - performs the transition from player to player

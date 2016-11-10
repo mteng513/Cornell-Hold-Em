@@ -4,7 +4,7 @@
  * Labltk. The type definitions are subject to change. *)
 
 
-module type GUPoker = sig 
+module type gu_poker = sig 
 
 	(* Draws main window for the game *)
 	val draw_start : unit -> unit 

@@ -3,10 +3,10 @@
  * to deceive the player. It will still use the Player
  * interface. *)
 
-module type Opponent : Player = sig 
+module type opponent : player = sig 
 
 	(* Identifier for the user set difficulty. *)
-	type Difficulty
+	type difficulty
 
 	(* Because we include the player interface, we
 	 * have access to the hand. We will also be able

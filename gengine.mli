@@ -3,16 +3,16 @@
  * It is entirely possible that this (and others) interface will
  * be modified heavily *)
 
-module type GameEngine = sig
+module type game_engine = sig
 
 	(* Card type for the engine *)
-	type Card
+	type card
 
 	(* Deck type for the engine *)
-	type Deck
+	type deck
 
 	(* Play type for the engine (ie. the cards that are in play) *)
-	type PlayCards
+	type play_cards
 
 	(* An enumerator type for the game state as it applies to a 
 	 * particular round of poker. The states are as follows:
@@ -26,7 +26,7 @@ module type GameEngine = sig
 	  * The STATE type will maintain additional information, but will
 	  * perform decisions based off of the current game state.
 	  *)
-	type CURRENT_STATE
+	type current_state
 
 	(* Global identifier for the entire game state. It will need to
 	 * contain several pieces of information, such as: 
@@ -36,7 +36,7 @@ module type GameEngine = sig
 		4. Current game state
 		5. Number of players
 	*) 
-	type STATE 
+	type state 
 
 
 	(* Switch function - performs the transition from player to player

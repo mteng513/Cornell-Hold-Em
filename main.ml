@@ -1,5 +1,5 @@
-open gengine
-open player
-open opponent
+open Gengine
+open Player
+open Opponent
 open GUpoker
 

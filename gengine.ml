@@ -32,24 +32,37 @@ module Game_Engine = struct
 	let score g_state = 
 		failwith "Unimplemented"
 
-	let transition_state g_state = 
-		ignore (g_state.c_player = 0);
+	(* let transition_state g_state = 
+		ignore (g_state.c_player <- 0);
 		match g_state.current_st with
-			| START -> g_state.current_st = DEAL 
-			| DEAL -> g_state.current_st = BET_ONE
-			| BET_ONE -> g_state.current_st = BET_TWO
-			| BET_TWO -> g_state.current_st = BET_THREE
-			| BET_THREE -> g_state.current_st = SCORE; score g_state
+			| START -> g_state.current_st <- DEAL 
+			| DEAL -> g_state.current_st <- BET_ONE
+			| BET_ONE -> g_state.current_st <- BET_TWO
+			| BET_TWO -> g_state.current_st <- BET_THREE
+			| BET_THREE -> g_state.current_st <- SCORE; score g_state
 			| SCORE -> if g_state.n_players = 1 then 
-				g_state.current_st = END else g_state.current_st = DEAL
+				g_state.current_st <- END else g_state.current_st <- DEAL
 			| END -> failwith "Bad"
 
 	let mutable_incr i = 
-		i = i + 1
+		i := i + 1; *)
 
 	let switch g_state = 
-		if (g_state.c_player = g_state.n_players) then transition_state g_state else
-			mutable_incr g_state.c_player 
+		failwith "Unimplemented"
 
+	let deal g_state = 
+		failwith "Unimplemented"
+
+	let flop g_state = 
+		failwith "Unimplemented"
+
+	let turn g_state = 
+		failwith "Unimplemented"
+
+	let river g_state = 
+		failwith "Unimplemented"
+
+	let init g_state = 
+		failwith "Unimplemented"
 
 end 

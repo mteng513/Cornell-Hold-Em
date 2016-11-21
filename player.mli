@@ -2,10 +2,7 @@
  * will be sufficient for players, but will need to be extended
  * upon for the AI players. *)
 
-module type Player = sig 
-	
-	(* Hand type for the better. Consists of two cards. *)
-	type hand
+module Player : sig 
 
 	(* Amount of money remaining to be bet. Player loses if they
 	 * hit 0. *)

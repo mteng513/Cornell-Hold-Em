@@ -1,5 +1,9 @@
 (* Ml file for the player *)
+open Gengine
+
 module Player = struct
+
+	include Gengine
 
 	type cash = int 
 

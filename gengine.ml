@@ -29,6 +29,66 @@ module Game_Engine = struct
 		hands : (int * hand) list;
 	}
 
+	(* End of type declarations. We will now declare some references that
+	 * will need to be updated as we go. *)
+
+	let deck = ref [] 
+	let state = ref {current_st = START; cards_in_play = []; pot = 0;
+		current_bet = 0; n_players = 0; c_player = 0; hands = []} 	
+
+	let reset_deck () = deck := 
+		[(One, Clarkson); (Two, Clarkson); (Three, Clarkson); 
+		(Four, Clarkson); (Five, Clarkson); (Six, Clarkson);
+		(Seven, Clarkson); (Eight, Clarkson); (Nine, Clarkson);
+		(Jack, Clarkson); (Queen, Clarkson); (King, Clarkson);
+		(Ace, Clarkson); 
+		(One, Gries); (Two, Gries); (Three, Gries); 
+		(Four, Gries); (Five, Gries); (Six, Gries);
+		(Seven, Gries); (Eight, Gries); (Nine, Gries);
+		(Jack, Gries); (Queen, Gries); (King, Gries);
+		(Ace, Gries);
+		(One, Dijkstra); (Two, Dijkstra); (Three, Dijkstra); 
+		(Four, Dijkstra); (Five, Dijkstra); (Six, Dijkstra);
+		(Seven, Dijkstra); (Eight, Dijkstra); (Nine, Dijkstra);
+		(Jack, Dijkstra); (Queen, Dijkstra); (King, Dijkstra);
+		(Ace, Dijkstra);
+		(One, George); (Two, George); (Three, George); 
+		(Four, George); (Five, George); (Six, George);
+		(Seven, George); (Eight, George); (Nine, George);
+		(Jack, George); (Queen, George); (King, George);
+		(Ace, George);
+		]
+
+	(* Pushes an element onto a ref list *)
+	let push lst ele = 
+		lst := ele::!lst
+
+	(* Pops an element off of a ref list *)
+	let pop lst = 
+		match !lst with
+			| [] -> []
+			| h::t -> lst := t; h 
+
+	let rec shuffle_helper deck lst1 lst2 = 
+		match !deck with
+			| [] -> []
+			| h::t -> (if (Random.int 5200 mod 2 = 0) then 
+				push lst1 h else push lst2 h); let tt = ref t in
+				shuffle_helper tt lst1 lst2
+
+
+	(* Started shuffle. I think it's clear what I'm trying to do here, but
+	 * lmk if unclear *)
+	let shuffle () = 
+		let a_list = ref [] in 
+		let b_list = ref [] in 
+    shuffle_helper deck a_list b_list;
+    deck := b_list @ a_list 
+
+
+
+
+
 	let score g_state = 
 		failwith "Unimplemented"
 

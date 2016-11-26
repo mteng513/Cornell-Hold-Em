@@ -52,15 +52,15 @@ module Game_Engine : sig
 	(* Flop function for the engine. Will draw three cards and display them
 	 * to the user and the opponents. Transitions into the second round of
 	 * betting. *)
-	val flop : global_state -> unit 
+	val flop : global_state -> play_cards 
 
 	(* Turn function for the engine. Draws the 4th card and displays it to the
 	 * players. Transitions into the third round of betting. *)
-	val turn : global_state -> unit 
+	val turn : global_state -> play_cards 
 
 	(* River function for the engine. Lays the final card, and transitions to the
 	 * final betting round *)
-	val river : global_state -> unit
+	val river : global_state -> play_cards
 
 	(* Score function for the engine. Transitions to the score stage, where the 
 	 * score of all hands still in is computed and the winner is declared. If

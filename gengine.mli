@@ -47,7 +47,7 @@ module Game_Engine : sig
 	(* Deal function for the game engine. Deals two cards to every player,
 	 * recording the results for the player in the engine. Transitions into 
 	 * the deal stage, and then into the first round of betting *)
-	val deal : global_state -> unit 
+	val deal : global_state -> card list ref -> unit 
 
 	(* Flop function for the engine. Will draw three cards and display them
 	 * to the user and the opponents. Transitions into the second round of

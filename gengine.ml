@@ -71,7 +71,7 @@ module Game_Engine = struct
 
 	let rec shuffle_helper deck lst1 lst2 = 
 		match !deck with
-			| [] -> []
+			| [] -> ()
 			| h::t -> (if (Random.int 5200 mod 2 = 0) then 
 				push lst1 h else push lst2 h); let tt = ref t in
 				shuffle_helper tt lst1 lst2
@@ -82,8 +82,8 @@ module Game_Engine = struct
 	let shuffle () = 
 		let a_list = ref [] in 
 		let b_list = ref [] in 
-    shuffle_helper deck a_list b_list;
-    deck := b_list @ a_list 
+    shuffle_helper deck a_list b_list; 
+    deck := (!b_list) @ (!a_list)
 
 
 

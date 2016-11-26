@@ -1,6 +1,5 @@
 (* ml file for the Game Engine *)
 
-
 module Game_Engine = struct
 
 	type suit = Clarkson | Gries | Dijkstra | George
@@ -28,6 +27,8 @@ module Game_Engine = struct
 		mutable c_player : int;
 		mutable hands : (int * hand) list;
 	}
+
+	exception GameEnded
 
 	(* End of type declarations. We will now declare some references that
 	 * will need to be updated as we go. *)
@@ -138,8 +139,20 @@ module Game_Engine = struct
 	let mutable_incr i = 
 		i := !i + 1
 
+	(* Signals bets to the players. *)
+	let signal_bet current_player = failwith "Unimplemented"
+
+	(* Called in after deal and each bet stage to signal bets to
+	 * all the players. *)
 	let switch g_state = 
-		failwith "Unimplemented"
+		match g_state.current_st with 
+			| BET_ONE | BET_TWO | BET_THREE ->
+				(for i = 0 to g_state.n_players do 
+					signal_bet g_state.c_player; 
+					g_state.c_player <- g_state.c_player + 1; done);
+				g_state.c_player <- 0;
+				transition_state g_state;
+			| _ -> failwith "Bad state"
 
 	let deal g_state deck = 
 		(* step 1: make sure deck has enough cards *)
@@ -150,9 +163,8 @@ module Game_Engine = struct
 		(for i = 1 to g_state.n_players do
 			g_state.hands <- 
 				(g_state.n_players - i, [pop deck; pop deck])::(g_state.hands)
-		done)(* ;
-		step 3: MAYBE?!?!?! change state to BET_ONE 
-		transition_state g_state *)
+		done);
+		transition_state g_state
 
 	let flop g_state = 
 		g_state.cards_in_play <- pop deck::g_state.cards_in_play;
@@ -171,8 +183,15 @@ module Game_Engine = struct
 		(* change to formatted print function? *)
 		g_state.cards_in_play
 
-
 	let init g_state = 
-		failwith "Unimplemented"
+		try 
+			deal g_state deck; 
+
+
+		with 
+			| GameEnded -> ()
+			| _ -> failwith "This is bad"
+
+
 
 end 

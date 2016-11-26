@@ -124,13 +124,21 @@ module Game_Engine = struct
 		transition_state g_state *)
 
 	let flop g_state = 
-		failwith "Unimplemented"
+		g_state.cards_in_play <- pop deck::g_state.cards_in_play;
+		g_state.cards_in_play <- pop deck::g_state.cards_in_play;
+		g_state.cards_in_play <- pop deck::g_state.cards_in_play;
+		(* change to formatted print function? *)
+		g_state.cards_in_play
 
 	let turn g_state = 
-		failwith "Unimplemented"
+		g_state.cards_in_play <- pop deck::g_state.cards_in_play;
+		(* change to formatted print function? *)
+		g_state.cards_in_play
 
 	let river g_state = 
-		failwith "Unimplemented"
+		g_state.cards_in_play <- pop deck::g_state.cards_in_play;
+		(* change to formatted print function? *)
+		g_state.cards_in_play
 
 	let init g_state = 
 		failwith "Unimplemented"

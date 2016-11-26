@@ -34,8 +34,41 @@ module Game_Engine = struct
 
 	let deck = ref [] 
 	let state = ref {current_st = START; cards_in_play = []; pot = 0;
-		current_bet = 0; n_players = 0; c_player = 0; hands = []} 	
+		current_bet = 0; n_players = 0; c_player = 0; hands = []}
 
+	let suit_print suit =
+		match suit with 
+			| Clarkson -> "Clarkson "
+			| Gries -> "Gries "
+			| Dijkstra -> "Dijkstra "
+			| George -> "George "
+
+	let print_helper ele = 
+		match ele with 
+			| (One, suit) -> "One of " ^ suit_print suit 
+			| (Two, suit) -> "Two of " ^ suit_print suit
+			| (Three, suit) -> "Three of " ^ suit_print suit
+			| (Four, suit) -> "Four of " ^ suit_print suit
+			| (Five, suit) -> "Five of " ^ suit_print suit
+			| (Six, suit) -> "Six of " ^ suit_print suit
+			| (Seven, suit) -> "Seven of " ^ suit_print suit
+			| (Eight, suit) -> "Eight of " ^ suit_print suit
+			| (Nine, suit) -> "Nine of " ^ suit_print suit
+			(* | (Ten, suit) -> "Ten of " ^ suit_print suit  We have no ten? *)
+			| (Jack, suit) -> "Jack of " ^ suit_print suit
+			| (Queen, suit) -> "Queen of " ^ suit_print suit
+			| (King, suit) -> "King of " ^ suit_print suit
+			| (Ace, suit) -> "Ace of " ^ suit_print suit
+
+	let rec formatted_print lst = 
+		match lst with 
+			| [] -> ""
+			| h::t -> (print_helper h) ^ formatted_print t
+
+	let printc lst =
+		print_endline (formatted_print lst)
+
+	(* Deck reset function. Sets the deck back to normal state. *)
 	let reset_deck () = deck := 
 		[(One, Clarkson); (Two, Clarkson); (Three, Clarkson); 
 		(Four, Clarkson); (Five, Clarkson); (Six, Clarkson);
@@ -69,6 +102,8 @@ module Game_Engine = struct
 			| [] -> failwith "no more card in the deck"
 			| h::t -> lst := t; h 
 
+	(* Helper for shuffle. Takes in a deck, and pushes the elements
+	 * of the deck onto two lists psuedo randomly. *)
 	let rec shuffle_helper deck lst1 lst2 = 
 		match !deck with
 			| [] -> ()
@@ -76,18 +111,14 @@ module Game_Engine = struct
 				push lst1 h else push lst2 h); let tt = ref t in
 				shuffle_helper tt lst1 lst2
 
-
-	(* Started shuffle. I think it's clear what I'm trying to do here, but
-	 * lmk if unclear *)
+	(* Shuffling mechanism. Creates two ref lists to be randomly
+	 * pushed onto, punts to the helper, then sets the deck equal to
+	 * the newly shuffeled deck. *)
 	let shuffle () = 
 		let a_list = ref [] in 
 		let b_list = ref [] in 
     shuffle_helper deck a_list b_list; 
     deck := (!b_list) @ (!a_list)
-
-
-
-
 
 	let score g_state = 
 		failwith "Unimplemented"
@@ -139,6 +170,7 @@ module Game_Engine = struct
 		g_state.cards_in_play <- pop deck::g_state.cards_in_play;
 		(* change to formatted print function? *)
 		g_state.cards_in_play
+
 
 	let init g_state = 
 		failwith "Unimplemented"

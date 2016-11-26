@@ -108,6 +108,12 @@ module Game_Engine = struct
 		i := i + 1; *)
 
 	let switch g_state = 
+		(* step 1: make sure deck has enough cards *)
+		if List.length deck < (g_state.n_players+5) then reset_deck (); shuffle ()
+		(* else continue (shuffle deck is just a filler) *)
+		else shuffle ()
+		(* step 2: give player 2 cards using pop *)
+		(* step 3: give AI  *)
 		failwith "Unimplemented"
 
 	let deal g_state = 

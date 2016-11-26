@@ -26,7 +26,7 @@ module Game_Engine = struct
 		mutable current_bet : int;
 		mutable n_players : int;
 		mutable c_player : int;
-		hands : (int * hand) list;
+		mutable hands : (int * hand) list;
 	}
 
 	(* End of type declarations. We will now declare some references that
@@ -66,7 +66,7 @@ module Game_Engine = struct
 	(* Pops an element off of a ref list *)
 	let pop lst = 
 		match !lst with
-			| [] -> []
+			| [] -> failwith "no more card in the deck"
 			| h::t -> lst := t; h 
 
 	let rec shuffle_helper deck lst1 lst2 = 
@@ -108,16 +108,18 @@ module Game_Engine = struct
 		i := i + 1; *)
 
 	let switch g_state = 
-		(* step 1: make sure deck has enough cards *)
-		if List.length deck < (g_state.n_players+5) then reset_deck (); shuffle ()
-		(* else continue (shuffle deck is just a filler) *)
-		else shuffle ()
-		(* step 2: give player 2 cards using pop *)
-		(* step 3: give AI  *)
 		failwith "Unimplemented"
 
 	let deal g_state = 
-		failwith "Unimplemented"
+		(* step 1: make sure deck has enough cards *)
+		(if List.length !deck < (g_state.n_players+5) 
+		then (reset_deck (); shuffle ())
+		else ());
+		(* step 2: give player 2 cards using pop *)
+		for i = 1 to g_state.n_players do
+			(pop deck, pop deck)::g_state.hands
+		done
+		(* step 3: give AI  *)
 
 	let flop g_state = 
 		failwith "Unimplemented"

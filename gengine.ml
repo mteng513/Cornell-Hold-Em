@@ -115,11 +115,13 @@ module Game_Engine = struct
 		(if List.length !deck < (g_state.n_players+5) 
 		then (reset_deck (); shuffle ())
 		else ());
-		(* step 2: give player 2 cards using pop *)
-		for i = 1 to g_state.n_players do
-			(g_state.n_players - i, [pop deck; pop deck])::(g_state.hands)
-		done
-		(* step 3: give AI  *)
+		(* step 2: deal cards to all players using pop *)
+		(for i = 1 to g_state.n_players do
+			g_state.hands <- 
+				(g_state.n_players - i, [pop deck; pop deck])::(g_state.hands)
+		done);
+		(* step 3: MAYBE?!?!?! change state to BET_ONE  *)
+		transition_state g_state
 
 	let flop g_state = 
 		failwith "Unimplemented"

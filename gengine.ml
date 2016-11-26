@@ -92,7 +92,7 @@ module Game_Engine = struct
 	let score g_state = 
 		failwith "Unimplemented"
 
-	(* let transition_state g_state = 
+	let transition_state g_state = 
 		ignore (g_state.c_player <- 0);
 		match g_state.current_st with
 			| START -> g_state.current_st <- DEAL 
@@ -105,7 +105,7 @@ module Game_Engine = struct
 			| END -> failwith "Bad"
 
 	let mutable_incr i = 
-		i := i + 1; *)
+		i := !i + 1
 
 	let switch g_state = 
 		failwith "Unimplemented"

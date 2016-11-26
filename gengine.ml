@@ -117,7 +117,7 @@ module Game_Engine = struct
 		else ());
 		(* step 2: give player 2 cards using pop *)
 		for i = 1 to g_state.n_players do
-			(pop deck, pop deck)::g_state.hands
+			(g_state.n_players - i, [pop deck; pop deck])::(g_state.hands)
 		done
 		(* step 3: give AI  *)
 

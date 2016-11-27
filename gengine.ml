@@ -15,7 +15,7 @@ module Game_Engine = struct
 
 	type hand = card list
 
-	type current_state = START | DEAL | BET_ONE | BET_TWO | BET_THREE | SCORE
+	type current_state = START | DEAL | BET_ZERO | BET_ONE | BET_TWO | BET_THREE | SCORE
 		| END
 
 	type global_state = {
@@ -25,7 +25,9 @@ module Game_Engine = struct
 		mutable current_bet : int;
 		mutable n_players : int;
 		mutable c_player : int;
-		mutable hands : (int * hand) list;
+		mutable hands : (int * hand) list; 
+		mutable bets : int array;
+		mutable p_statuses : bool array;
 	}
 
 	exception GameEnded
@@ -128,7 +130,8 @@ module Game_Engine = struct
 		ignore (g_state.c_player <- 0);
 		match g_state.current_st with
 			| START -> g_state.current_st <- DEAL 
-			| DEAL -> g_state.current_st <- BET_ONE
+			| DEAL -> g_state.current_st <- BET_ZERO
+			| BET_ZER0 -> g_state.current_st <- BET_ONE
 			| BET_ONE -> g_state.current_st <- BET_TWO
 			| BET_TWO -> g_state.current_st <- BET_THREE
 			| BET_THREE -> g_state.current_st <- SCORE
@@ -174,7 +177,7 @@ module Game_Engine = struct
 							g_state.current_bet <- bet + g_state.current_bet;
 							g_state.pot <- g_state.pot+bet (* -g_state.c_player_bet *)
 		(* if a player matches, the bet is added to the pot (can be 0) *)
-		| bet when bet = g_state.current_bet -> g_state.pot <- g_state.pot+bet (* -g_state.c_player_bet *)
+		| bet when bet = g_state.current_bet -> g_state.pot <- g_state.pot+bet (* -g_state.bets c_player_bet *)
 		(* if a player decides not to bet, they fold *)
 		| bet when bet = 0 -> () (* this means the player folds *)
 		(* if negative # or # less than bet, retry *)
@@ -185,10 +188,13 @@ module Game_Engine = struct
 	 * all the players. *)
 	let switch g_state = 
 		match g_state.current_st with 
-			| BET_ONE | BET_TWO | BET_THREE ->
+			| BET_ZERO | BET_ONE | BET_TWO | BET_THREE ->
+				(* I think this needs to be a while loop until you reach the player who set the highest bet
+				We also need to make sure we don't go through players that have folded *)
 				(for i = 0 to g_state.n_players do 
 					signal_bet g_state; 
 					g_state.c_player <- g_state.c_player + 1; done);
+
 				g_state.c_player <- 0;
 				transition_state g_state;
 			| _ -> failwith "Bad state"

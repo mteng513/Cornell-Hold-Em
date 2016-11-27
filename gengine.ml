@@ -146,19 +146,38 @@ module Game_Engine = struct
 		instead of c_player? Does the signal_bet function even depend on which
 		player is being prompted? *)
 
-	(* This is what current player (c_player) is for. It's the index of the player who's
+	(* This is what current player (c_player) is for. It's the index of the player whose
    * turn it is to bet. Notice how we go through each player in signal bet. *)
+
+   (* But all we do is iterate through all the players once. What happens in a 
+   a player other than the first player bets, or multiple players bet in a round?
+   we should be giving all other players a chance to get after one player has made a bet 
+
+	The problem with not keeping track of what each player has bet also arises from this
+	opportunity to bet multiple times. How are we keeping track of how much more a player
+	is adding to the pot? Say the first player bet a little, the second player bets more,
+	and the third player bets even more. Everyone gets a chance to match that third player's
+	bet, but the first and second players have already bet a little bit, and different amounts.
+	How do we make sure they dont overbet? I think we need a list to keep track of that. It would
+	also make it easier to display how much everyone has bet on our GUI because we could 
+	just access a preexisting list rather than trying to figure out how to do that later *)
 
 	(* Signals bets to the players. *)
 	let rec signal_bet g_state (* current_player *) = 
 		print_endline ("Place your bet. 
 			The current bet is " ^ (string_of_int g_state.current_bet));
 		let bet = read_int () in
-		match bet with
 		(* must make every other player match the bet, raise, or fold *)
-		| bet when bet > g_state.current_bet -> g_state.current_bet <- bet
-		| bet when bet = g_state.current_bet -> (* continue to to other players *) ()
+		match bet with
+		(* if player raises, bet and pot both increase *)
+		| bet when bet > g_state.current_bet -> 
+							g_state.current_bet <- bet + g_state.current_bet;
+							g_state.pot <- g_state.pot+bet (* -g_state.c_player_bet *)
+		(* if a player matches, the bet is added to the pot (can be 0) *)
+		| bet when bet = g_state.current_bet -> g_state.pot <- g_state.pot+bet (* -g_state.c_player_bet *)
+		(* if a player decides not to bet, they fold *)
 		| bet when bet = 0 -> () (* this means the player folds *)
+		(* if negative # or # less than bet, retry *)
 		| _ -> print_endline "invalid input received. try again"; 
 							signal_bet g_state
 

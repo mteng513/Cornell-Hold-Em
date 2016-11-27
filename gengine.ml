@@ -5,7 +5,7 @@ module Game_Engine = struct
 	type suit = Clarkson | Gries | Dijkstra | George
 
 	type rank = One | Two | Three | Four | Five | Six | Seven
-		| Eight | Nine | Jack | Queen | King | Ace
+		| Eight | Nine | Ten | Jack | Queen | King | Ace
 
 	type card = rank * suit
 
@@ -55,7 +55,7 @@ module Game_Engine = struct
 			| (Seven, suit) -> "Seven of " ^ suit_print suit
 			| (Eight, suit) -> "Eight of " ^ suit_print suit
 			| (Nine, suit) -> "Nine of " ^ suit_print suit
-			(* | (Ten, suit) -> "Ten of " ^ suit_print suit  We have no ten? *)
+			| (Ten, suit) -> "Ten of " ^ suit_print suit
 			| (Jack, suit) -> "Jack of " ^ suit_print suit
 			| (Queen, suit) -> "Queen of " ^ suit_print suit
 			| (King, suit) -> "King of " ^ suit_print suit
@@ -74,22 +74,22 @@ module Game_Engine = struct
 		[(One, Clarkson); (Two, Clarkson); (Three, Clarkson); 
 		(Four, Clarkson); (Five, Clarkson); (Six, Clarkson);
 		(Seven, Clarkson); (Eight, Clarkson); (Nine, Clarkson);
-		(Jack, Clarkson); (Queen, Clarkson); (King, Clarkson);
+		(Ten, Clarkson); (Jack, Clarkson); (Queen, Clarkson); (King, Clarkson);
 		(Ace, Clarkson); 
 		(One, Gries); (Two, Gries); (Three, Gries); 
 		(Four, Gries); (Five, Gries); (Six, Gries);
 		(Seven, Gries); (Eight, Gries); (Nine, Gries);
-		(Jack, Gries); (Queen, Gries); (King, Gries);
+		(Ten, Gries); (Jack, Gries); (Queen, Gries); (King, Gries);
 		(Ace, Gries);
 		(One, Dijkstra); (Two, Dijkstra); (Three, Dijkstra); 
 		(Four, Dijkstra); (Five, Dijkstra); (Six, Dijkstra);
 		(Seven, Dijkstra); (Eight, Dijkstra); (Nine, Dijkstra);
-		(Jack, Dijkstra); (Queen, Dijkstra); (King, Dijkstra);
+		(Ten, Dijkstra); (Jack, Dijkstra); (Queen, Dijkstra); (King, Dijkstra);
 		(Ace, Dijkstra);
 		(One, George); (Two, George); (Three, George); 
 		(Four, George); (Five, George); (Six, George);
 		(Seven, George); (Eight, George); (Nine, George);
-		(Jack, George); (Queen, George); (King, George);
+		(Ten, George); (Jack, George); (Queen, George); (King, George);
 		(Ace, George);
 		]
 
@@ -131,7 +131,7 @@ module Game_Engine = struct
 			| DEAL -> g_state.current_st <- BET_ONE
 			| BET_ONE -> g_state.current_st <- BET_TWO
 			| BET_TWO -> g_state.current_st <- BET_THREE
-			| BET_THREE -> g_state.current_st <- SCORE; score g_state
+			| BET_THREE -> g_state.current_st <- SCORE
 			| SCORE -> if g_state.n_players = 1 then 
 				g_state.current_st <- END else g_state.current_st <- DEAL
 			| END -> failwith "Bad"
@@ -145,6 +145,9 @@ module Game_Engine = struct
 		a bet, then how do we account for that in switch? Why don't we just input g_state entirely
 		instead of c_player? Does the signal_bet function even depend on which
 		player is being prompted? *)
+
+	(* This is what current player (c_player) is for. It's the index of the player who's
+   * turn it is to bet. Notice how we go through each player in signal bet. *)
 
 	(* Signals bets to the players. *)
 	let rec signal_bet g_state (* current_player *) = 
@@ -201,15 +204,47 @@ module Game_Engine = struct
 		g_state.cards_in_play <- pop deck::g_state.cards_in_play;
 		printc (g_state.cards_in_play)
 
+	let game_loop g_state = 
+		(* Transition to the deal stage. Deal. *)
+		transition_state g_state;
+		deal g_state deck; 
+
+		(* FOR NOW: Deal flop, then bet. *)
+		flop g_state;
+		switch g_state;
+
+		(* Drop the turn, bet. *)
+		turn g_state;
+		switch g_state;
+
+		(* Drop the river, bet. *)
+		river g_state;
+		switch g_state;
+
+		(* Now, we are in the score stage. *)
+		score g_state;
+		transition_state g_state;
+
+		(* At this point, we want to do a few thing while not touching the 
+		 * state since the outter loop will need it to determine whether or 
+		 * not the game has ended. Score needs to allocate chips to whoever won
+		 * them. *)
+		 reset_deck (); shuffle (); shuffle (); shuffle () 
+
 	let init g_state = 
 		try 
-			deal g_state deck; 
+			(* Initial state is set to Start. There are no players, no cards,
+       * no bets. Read in number of players. *)
+      print_endline ("Welcome to Cornell Hold'Em! Enter the number of 
+      players you'd like to play with.");
+      let players = read_int () in
+      g_state.n_players <- players;
 
+      (while (g_state.current_st <> END) do game_loop g_state done); 
+      raise GameEnded
 
 		with 
 			| GameEnded -> ()
 			| _ -> failwith "This is bad"
-
-
 
 end 

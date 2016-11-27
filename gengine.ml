@@ -139,8 +139,25 @@ module Game_Engine = struct
 	let mutable_incr i = 
 		i := !i + 1
 
+
+	(* DO WE NEED A LIST THAT KEEPS TRACK OF WHAT EACH PLAYER HAS BET?
+		HOW ARE WE KEEPING TRACK OF WHO HAS ALREADY BET? IF someone raises
+		a bet, then how do we account for that in switch? Why don't we just input g_state entirely
+		instead of c_player? Does the signal_bet function even depend on which
+		player is being prompted? *)
+
 	(* Signals bets to the players. *)
-	let signal_bet current_player = failwith "Unimplemented"
+	let rec signal_bet g_state (* current_player *) = 
+		print_endline ("Place your bet. 
+			The current bet is " ^ (string_of_int g_state.current_bet));
+		let bet = read_int () in
+		match bet with
+		(* must make every other player match the bet, raise, or fold *)
+		| bet when bet > g_state.current_bet -> g_state.current_bet <- bet
+		| bet when bet = g_state.current_bet -> (* continue to to other players *) ()
+		| bet when bet = 0 -> () (* this means the player folds *)
+		| _ -> print_endline "invalid input received. try again"; 
+							signal_bet g_state
 
 	(* Called in after deal and each bet stage to signal bets to
 	 * all the players. *)
@@ -148,13 +165,16 @@ module Game_Engine = struct
 		match g_state.current_st with 
 			| BET_ONE | BET_TWO | BET_THREE ->
 				(for i = 0 to g_state.n_players do 
-					signal_bet g_state.c_player; 
+					signal_bet g_state; 
 					g_state.c_player <- g_state.c_player + 1; done);
 				g_state.c_player <- 0;
 				transition_state g_state;
 			| _ -> failwith "Bad state"
 
-	let deal g_state deck = 
+	(* deal takes in the current_st g_state and the current deck ref (deck) and
+	   updates the inputted state with hands *)
+	let deal g_state deck = () 
+		let deal g_state deck = 
 		(* step 1: make sure deck has enough cards *)
 		(if List.length !deck < (g_state.n_players+5) 
 		then (reset_deck (); shuffle ())
@@ -162,9 +182,10 @@ module Game_Engine = struct
 		(* step 2: deal cards to all players using pop *)
 		(for i = 1 to g_state.n_players do
 			g_state.hands <- 
-				(g_state.n_players - i, [pop deck; pop deck])::(g_state.hands)
-		done);
-		transition_state g_state
+				(g_state.n_players - i, [pop deck; pop deck])::(g_state.hands);
+		done)(* ;
+		(*step 3: MAYBE?!?!?! change state to BET_ONE*) 
+		transition_state g_state *)
 
 	let flop g_state = 
 		g_state.cards_in_play <- pop deck::g_state.cards_in_play;

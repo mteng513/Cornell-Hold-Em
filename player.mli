@@ -5,7 +5,7 @@ open Gengine
 
 module Player : sig 
 
-	include Game_Engine
+	open Game_Engine
 
 	(* Amount of money remaining to be bet. Player loses if they
 	 * hit 0. *)

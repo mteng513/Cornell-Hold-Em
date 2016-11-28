@@ -9,10 +9,10 @@ module Opponent = struct
 
   type difficulty = One | Two | Three 
 
-  (* let suit_helper (c1 : rank) (c2 : rank) = 
+  let suit_helper (c1 : rank) (c2 : rank) = 
   	match (c1, c2) with 
   		| (l, r) when (l = r) ->
-  			match l with 
+  			(match l with 
   				| Ace -> (true, (Random.int 800))
   				| King -> (true, (Random.int 775))
   				| Queen -> (true, (Random.int 760))
@@ -25,10 +25,10 @@ module Opponent = struct
   				| Five -> (true, (Random.int 300))
   				| Four -> (true, (Random.int 200))
   				| Three -> (true, (Random.int 125))
-  				| Two -> (true, (Random.int 100))
+  				| Two -> (true, (Random.int 100)))
 
-  		| (l, r) when (l <> r) -> 
-  			match (l, r) with 
+  		| l, r when (l <> r) -> 
+  			(match (l, r) with 
   				| (King, Ace) -> (true, (Random.int 600))
   				| (Queen, Ace) -> (true, (Random.int 400))
   				| (Jack, Ace) -> (true, (Random.int 200))
@@ -55,12 +55,14 @@ module Opponent = struct
   				| (Five, Seven) -> (true, (Random.int 60))
   				| (Five, Six) -> (true, (Random.int 50))
   				| (Four, Five) -> (true, Random.int 30)
-  				| _ -> (true, 20)
+  				| _ -> (true, 20))
+
+  		| _ -> failwith "Bad"
 
   let unsuit_helper (c1 : rank) (c2 : rank) = 
   	match (c1, c2) with 
   		| (l, r) when (l = r) -> 
-  			match l with 
+  			(match l with 
   				| Ace -> (true, (Random.int 400))
   				| King -> (true, (Random.int 375))
   				| Queen -> (true, (Random.int 360))
@@ -73,10 +75,10 @@ module Opponent = struct
   				| Five -> (true, (Random.int 200))
   				| Four -> (true, (Random.int 100))
   				| Three -> (false, 0)
-  				| Two -> (false, 0)
+  				| Two -> (false, 0))
 
   		| (l, r) when (l <> r) ->
-  			match (l, r) with 
+  			(match (l, r) with 
   				| (Ace, King) -> (true, (Random.int 300))
   				| (Ace, Queen) -> (true, (Random.int 200))
   				| (Ace, Jack) -> (true, (Random.int 100))
@@ -96,71 +98,69 @@ module Opponent = struct
   				| (Ten, Six) -> (true, (Random.int 100))
   				| (Nine, Eight) -> (true, (Random.int 130))
   				| (Nine, Seven) -> (true, (Random.int 115))
-  				| _ -> (false, 0)
+  				| _ -> (false, 0))
+
+  		| _ -> failwith "Bad"
   				
   let b0_helper2 card1 card2 = 
   	match card1, card2 with
   		| (c1, s1), (c2, s2) when (s1 = s2) -> 
-  			match (suit_helper c1 c2) with 
+  			(match (suit_helper c1 c2) with 
   				| (true, amt) -> (if Random.int 2700 mod 5 = 0 then check () 
-  					else bet amt)
-  				| _ -> check ()
+  					else ignore (bet amt))
+  				| _ -> check ())
 
   		| (c1, s1), (c2, s2) when (s1 <> s2) -> 
-  			match (unsuit_helper c1 c2) with 
+  			(match (unsuit_helper c1 c2) with 
   				| (true, amt) -> (if Random.int 2700 mod 3 = 0 then check () 
-  					else bet amt)
-  				| _ -> (if Random.int 25 mod 2 = 0 then fold () else check ()) 
+  					else ignore (bet amt))
+  				| _ -> (if Random.int 25 mod 2 = 0 then fold () else check ())) 
 
-  		| _ -> bet (Random.int 100)
+  		| _ -> ignore (bet (Random.int 100))
 
   let bet_zero_helper hand = 
   	match hand with 
   		| (c1, c2) -> b0_helper2 c1 c2
 
   let four_max a b c d = 
-  	let max = ref !a in 
-    if (!b > !max)
-        max := b
-    if (!c > !max)
-        max := c
-    if (!d > !max)
+  	let max = ref a in 
+    if (b > !max) then 
+        max := b else 
+    if (c > !max) then 
+        max := c else 
+    if (d > !max) then 
         max := d
- 		max
+    else (failwith "Bad");
+ 		!max
 
   let flush lst = 
   	let c1 = ref 0 in let c2 = ref 0 in let c3 = ref 0 in let c4 = ref 0 in 
-  	for (i = 0) to (List.length lst) do 
-  		match (snd lst.[i]) with 
+  	(for i = 0 to (List.length lst) do 
+  		match (snd (List.nth lst i)) with 
   			| Clarkson -> c1 := !c1 + 1
   			| Gries -> c2 := !c2 + 1
   			| Dijkstra -> c3 := !c3 + 1
   			| George -> c4 := !c4 + 1
-  		done 
-  	let best_suit = four_max c1 c2 c3 c4 in 
-  	match (i, best_suit) with
-  		| (_, 5) -> true
-  		| (5, 4) -> true
-  		| (6, 4) -> true
-  		| (5, 3) -> true
+  		done);
+  	let best_suit = four_max !c1 !c2 !c3 !c4 in 
+  	match best_suit with
+  		| (5) -> true
+  		| (4) -> true
   		| _ -> false
 
   let flop_better cardlst = 
-  	match cardlst with
-  		| lst when (flush lst) -> bet (Random.int 750)
-  		| (c1, c2, c3, c4, c5) -> ()
+  	if (flush cardlst) then ignore (bet (Random.int 750))
+  	else check ()
 
 
   let bet_one_helper hand play_cards = 
-  	flop_better (hand @ play_cards) *)
+  	flop_better (hand @ play_cards)
 
-  let decide () = (false, 0)
-
-
-  	(* let st = (get_state ()) in 
+  let decide () = 
+  	let st = get_state () in 
   	match !st.current_st with
-
-  		| BET_ZERO -> (false, 0) *)
+  		| BET_ZERO -> (false, 0)
+  		| _ -> (false, 0)
 
 
 

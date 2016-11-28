@@ -103,15 +103,28 @@ module Game_Engine = struct
 
 	(* Helper for shuffle. Takes in a deck, and pushes the elements
 	 * of the deck onto two lists psuedo randomly. *)
-	let rec shuffle_helper deck lst1 lst2 lst3 = 
+	let rec shuffle_helper deck lst1 lst2 lst3 lst4 lst5 lst6 lst7 lst8 = 
 		match !deck with
 			| [] -> ()
 			| h::t -> let roll = Random.int 5200 in 
-				(if (roll mod 3 = 0) then 
-				push lst2 h 
-				else if ((roll mod 3) = 1) then push lst3 h
+				(if (roll mod 8 = 0) then push lst2 h 
+				else if ((roll mod 8) = 1) then push lst3 h
+				else if ((roll mod 8) = 2) then push lst4 h
+				else if ((roll mod 8) = 3) then push lst7 h
+				else if ((roll mod 8) = 4) then push lst5 h
+				else if ((roll mod 8) = 5) then push lst6 h
+				else if ((roll mod 8) = 6) then push lst8 h
 				else push lst1 h); let tt = ref t in
-				shuffle_helper tt lst1 lst2 lst3
+				shuffle_helper tt lst2 lst3 lst4 lst1 lst8 lst5 lst6 lst7
+
+	let cut () = 
+		let a_list = ref [] in
+		let b_list = ref [] in 
+		(for i = 0 to 51 do 
+			(if ((Random.int 3000) mod 2 = 0) then push a_list (List.nth !deck i)
+			else push b_list (List.nth !deck i))
+		done); 
+		deck := (!b_list) @ (!a_list)
 
 	(* Shuffling mechanism. Creates two ref lists to be randomly
 	 * pushed onto, punts to the helper, then sets the deck equal to
@@ -120,8 +133,16 @@ module Game_Engine = struct
 		let a_list = ref [] in 
 		let b_list = ref [] in 
 		let c_list = ref [] in 
-    shuffle_helper deck a_list b_list c_list; 
-    deck := (!b_list) @ (!a_list) @ (!c_list)
+		let d_list = ref [] in 
+		let e_list = ref [] in 
+		let f_list = ref [] in 
+		let g_list = ref [] in 
+		let h_list = ref [] in 
+    shuffle_helper deck a_list b_list c_list d_list e_list 
+    	f_list g_list h_list; 
+    deck := (!b_list) @ (!d_list) @ (!c_list) @ (!a_list) @ (!h_list) @
+    	(!f_list) @ (!e_list) @ (!g_list);
+    cut ()
 
     (* This function takes in the current_st g_state (POTENTIALLY NEEDS MORE INPUTS)
      * and updates the winning players scores with the points they won from the
@@ -270,7 +291,7 @@ module Game_Engine = struct
 		 * state since the outter loop will need it to determine whether or 
 		 * not the game has ended. Score needs to allocate chips to whoever won
 		 * them. *)
-		 reset_deck (); shuffle (); shuffle (); shuffle (); shuffle (); shuffle (); 
+		 reset_deck (); shuffle (); shuffle (); shuffle (); shuffle (); shuffle () 
 
 	let init () = 
 		try 

@@ -5,39 +5,33 @@
 
 module Game_Engine : sig
 
-	(* Card type for the engine *)
-	type card
+	type suit = Clarkson | Gries | Dijkstra | George
 
-	(* Deck type for the engine *)
-	type deck
+	type rank = Two | Three | Four | Five | Six | Seven
+		| Eight | Nine | Ten | Jack | Queen | King | Ace
 
-	(* Play type for the engine (ie. the cards that are in play) *)
-	type play_cards
+	type card = rank * suit
 
-	(* An enumerator type for the game state as it applies to a 
-	 * particular round of poker. The states are as follows:
-		1. START
-		2. DEAL
-		3. BET_ONE
-		4. BET_TWO
-		5. BET_THREE
-		6. SCORE
+	type deck = card list 
 
-	  * The STATE type will maintain additional information, but will
-	  * perform decisions based off of the current game state.
-	  *)
-	type current_state
+	type play_cards = card list 
 
-	(* Global identifier for the entire game state. It will need to
-	 * contain several pieces of information, such as: 
-		1. The deck
-		2. The hands of every player
-		3. Amount of money every player has
-		4. Current game state
-		5. Number of players
-	*) 
-	type global_state 
+	type hand = card list
 
+	type current_state = START | DEAL | BET_ZERO | BET_ONE | BET_TWO | BET_THREE | SCORE
+		| END
+
+	type global_state = {
+		mutable current_st : current_state;
+		mutable cards_in_play : play_cards;
+		mutable pot : int;
+		mutable current_bet : int;
+		mutable n_players : int;
+		mutable c_player : int;
+		mutable hands : (int * hand) list; 
+		mutable bets : int array;
+		mutable players_in : bool array;
+	}
 
 	(* Switch function - performs the transition from player to player
 	 * in the betting rounds by sending signals to the players that it

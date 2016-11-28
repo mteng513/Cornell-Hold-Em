@@ -103,12 +103,15 @@ module Game_Engine = struct
 
 	(* Helper for shuffle. Takes in a deck, and pushes the elements
 	 * of the deck onto two lists psuedo randomly. *)
-	let rec shuffle_helper deck lst1 lst2 = 
+	let rec shuffle_helper deck lst1 lst2 lst3 = 
 		match !deck with
 			| [] -> ()
-			| h::t -> (if (Random.int 5200 mod 2 = 0) then 
-				push lst1 h else push lst2 h); let tt = ref t in
-				shuffle_helper tt lst1 lst2
+			| h::t -> let roll = Random.int 5200 in 
+				(if (roll mod 3 = 0) then 
+				push lst2 h 
+				else if ((roll mod 3) = 1) then push lst3 h
+				else push lst1 h); let tt = ref t in
+				shuffle_helper tt lst1 lst2 lst3
 
 	(* Shuffling mechanism. Creates two ref lists to be randomly
 	 * pushed onto, punts to the helper, then sets the deck equal to
@@ -116,8 +119,9 @@ module Game_Engine = struct
 	let shuffle () = 
 		let a_list = ref [] in 
 		let b_list = ref [] in 
-    shuffle_helper deck a_list b_list; 
-    deck := (!b_list) @ (!a_list)
+		let c_list = ref [] in 
+    shuffle_helper deck a_list b_list c_list; 
+    deck := (!b_list) @ (!a_list) @ (!c_list)
 
     (* This function takes in the current_st g_state (POTENTIALLY NEEDS MORE INPUTS)
      * and updates the winning players scores with the points they won from the
@@ -266,7 +270,7 @@ module Game_Engine = struct
 		 * state since the outter loop will need it to determine whether or 
 		 * not the game has ended. Score needs to allocate chips to whoever won
 		 * them. *)
-		 reset_deck (); shuffle (); shuffle (); shuffle () 
+		 reset_deck (); shuffle (); shuffle (); shuffle (); shuffle (); shuffle (); 
 
 	let init () = 
 		try 

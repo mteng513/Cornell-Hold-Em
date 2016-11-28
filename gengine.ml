@@ -144,6 +144,8 @@ module Game_Engine = struct
 	let mutable_incr i = 
 		i := !i + 1
 
+	let get_state () = state 
+
 	(* Signals bets to the players. *)
 	let rec signal_bet g_state (* current_player *) = 
 		print_endline ("Place your bet. 

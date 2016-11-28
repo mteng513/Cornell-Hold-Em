@@ -1,8 +1,11 @@
 (* Main play interface, provides the betting interface that
  * will be sufficient for players, but will need to be extended
  * upon for the AI players. *)
+open Gengine
 
 module Player : sig 
+
+	include Game_Engine
 
 	(* Amount of money remaining to be bet. Player loses if they
 	 * hit 0. *)
@@ -22,5 +25,8 @@ module Player : sig
 
 	(* Check function that indicates the player does not wish to bet. *)
 	val check : unit -> unit
+
+	(* Getter for global state. *)
+	val state_getter : unit -> global_state ref 
 
 end

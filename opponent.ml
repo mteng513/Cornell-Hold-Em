@@ -7,7 +7,8 @@ module Opponent = struct
 
   type difficulty = One | Two | Three 
 
-  let decide () =
-  	failwith "Unimplemented"
+  let decide () = failwith "Unimplemented"
+
+
 
 end 

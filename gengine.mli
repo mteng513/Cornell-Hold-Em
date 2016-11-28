@@ -74,7 +74,10 @@ module Game_Engine : sig
 	 * until the game is over. This function should not terminate until
 	 * the game is over. Takes in an int to specify the number of opponents.
 	 *)
-	val init : global_state -> unit 
+	val init : unit -> unit 
+
+	(* Getter function for global state. *)
+	val get_state : unit -> global_state ref 
 
 
 

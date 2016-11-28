@@ -239,16 +239,16 @@ module Game_Engine = struct
 		 * them. *)
 		 reset_deck (); shuffle (); shuffle (); shuffle () 
 
-	let init g_state = 
+	let init () = 
 		try 
 			(* Initial state is set to Start. There are no players, no cards,
        * no bets. Read in number of players. *)
       print_endline ("Welcome to Cornell Hold'Em! Enter the number of 
       players you'd like to play with.");
       let players = read_int () in
-      g_state.n_players <- players;
+      !state.n_players <- players;
 
-      (while (g_state.current_st <> END) do game_loop g_state done); 
+      (while (!state.current_st <> END) do game_loop !state done); 
       raise GameEnded
 
 		with 

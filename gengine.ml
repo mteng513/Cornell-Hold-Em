@@ -9,9 +9,7 @@ module Game_Engine = struct
 
 	type card = rank * suit
 
-	type deck = card list 
-
-	type play_cards = card list 
+	type deck = card list
 
 	type hand = card list
 
@@ -20,7 +18,7 @@ module Game_Engine = struct
 
 	type global_state = {
 		mutable current_st : current_state;
-		mutable cards_in_play : play_cards;
+		mutable cards_in_play : card list;
 		mutable pot : int;
 		mutable current_bet : int;
 		mutable n_players : int;

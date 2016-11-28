@@ -4,7 +4,7 @@ module Game_Engine = struct
 
 	type suit = Clarkson | Gries | Dijkstra | George
 
-	type rank = One | Two | Three | Four | Five | Six | Seven
+	type rank = Two | Three | Four | Five | Six | Seven
 		| Eight | Nine | Ten | Jack | Queen | King | Ace
 
 	type card = rank * suit
@@ -48,8 +48,7 @@ module Game_Engine = struct
 			| George -> "George "
 
 	let print_helper ele = 
-		match ele with 
-			| (One, suit) -> "One of " ^ suit_print suit 
+		match ele with  
 			| (Two, suit) -> "Two of " ^ suit_print suit
 			| (Three, suit) -> "Three of " ^ suit_print suit
 			| (Four, suit) -> "Four of " ^ suit_print suit
@@ -74,25 +73,21 @@ module Game_Engine = struct
 
 	(* Deck reset function. Sets the deck back to normal state. *)
 	let reset_deck () = deck := 
-		[(One, Clarkson); (Two, Clarkson); (Three, Clarkson); 
-		(Four, Clarkson); (Five, Clarkson); (Six, Clarkson);
-		(Seven, Clarkson); (Eight, Clarkson); (Nine, Clarkson);
-		(Ten, Clarkson); (Jack, Clarkson); (Queen, Clarkson); (King, Clarkson);
-		(Ace, Clarkson); 
-		(One, Gries); (Two, Gries); (Three, Gries); 
-		(Four, Gries); (Five, Gries); (Six, Gries);
-		(Seven, Gries); (Eight, Gries); (Nine, Gries);
+		[(Two, Clarkson); (Three, Clarkson); (Four, Clarkson); 
+		(Five, Clarkson); (Six, Clarkson); (Seven, Clarkson); 
+		(Eight, Clarkson); (Nine, Clarkson); (Ten, Clarkson); (Jack, Clarkson);
+		(Queen, Clarkson); (King, Clarkson); (Ace, Clarkson); 
+		(Two, Gries); (Three, Gries); (Four, Gries); (Five, Gries);
+		(Six, Gries); (Seven, Gries); (Eight, Gries); (Nine, Gries);
 		(Ten, Gries); (Jack, Gries); (Queen, Gries); (King, Gries);
 		(Ace, Gries);
-		(One, Dijkstra); (Two, Dijkstra); (Three, Dijkstra); 
-		(Four, Dijkstra); (Five, Dijkstra); (Six, Dijkstra);
-		(Seven, Dijkstra); (Eight, Dijkstra); (Nine, Dijkstra);
-		(Ten, Dijkstra); (Jack, Dijkstra); (Queen, Dijkstra); (King, Dijkstra);
-		(Ace, Dijkstra);
-		(One, George); (Two, George); (Three, George); 
-		(Four, George); (Five, George); (Six, George);
-		(Seven, George); (Eight, George); (Nine, George);
-		(Ten, George); (Jack, George); (Queen, George); (King, George);
+		(Two, Dijkstra); (Three, Dijkstra); (Four, Dijkstra); (Five, Dijkstra);
+		(Six, Dijkstra); (Seven, Dijkstra); (Eight, Dijkstra); 
+		(Nine, Dijkstra); (Ten, Dijkstra); (Jack, Dijkstra); (Queen, Dijkstra);
+		(King, Dijkstra); (Ace, Dijkstra);
+		(Two, George); (Three, George); (Four, George); (Five, George); 
+		(Six, George); (Seven, George); (Eight, George); (Nine, George);
+		(Ten, George); (Jack, George); (Queen, George); (King, George); 
 		(Ace, George);
 		]
 
@@ -140,7 +135,7 @@ module Game_Engine = struct
 				g_state.current_st <- END else g_state.current_st <- DEAL
 			| END -> failwith "Bad"
 
-	(* increments a ref *)
+	(* increments an int ref *)
 	let mutable_incr i = 
 		i := !i + 1
 
@@ -165,6 +160,35 @@ module Game_Engine = struct
 		| _ -> print_endline "invalid input received. try again"; 
 							signal_bet g_state
 
+	(* takes in array a, element e, and the index accumulator index_acc.
+	 * returns the index of element e in array a. 
+	 * The index_acc should start at 0, or at whatever point you want to start *)
+	let rec index_in_array a e index_acc =
+		if a.(index_acc) = e 
+		then index_acc 
+		else index_in_array a e (index_acc+1)
+	
+	(* takes in an array and returns the greatest array element value *)
+	let rec max_of_array bets =
+		let len = Array.length bets in
+		match bets with
+		| [||] -> 0
+		| bets when len = 1 -> Array.get bets 0
+		| bets when len > 0 -> 
+			let x = Array.get bets 0 in
+			let y = max_of_array (Array.sub bets 1 (len - 1)) in
+			if x > y then x else y
+		| _ -> failwith "wtf is going on"
+
+
+	(* gets the index of the max element in an int array. Takes in the 
+	 * int array, bets, and the current_high accumulator of type int*int where
+	 * the first int is the value and the second int is the index of the actual
+	 * int in the array *)
+	let rec index_of_max (bets: int array) : int =
+		let max_element = max_of_array bets in
+		index_in_array bets max_element 0 
+
 	(* Called in after deal and each bet stage to signal bets to
 	 * all the players. *)
 	let switch g_state = 
@@ -172,7 +196,7 @@ module Game_Engine = struct
 			| BET_ZERO | BET_ONE | BET_TWO | BET_THREE ->
 				(* I think this needs to be a while loop until you reach the player who set the highest bet
 				We also need to make sure we don't go through players that have folded *)
-				(for i = 0 to g_state.n_players do 
+				(while not (g_state.c_player = index_of_max g_state.bets) do 
 					signal_bet g_state; 
 					g_state.c_player <- g_state.c_player + 1; done);
 
@@ -181,7 +205,7 @@ module Game_Engine = struct
 			| _ -> failwith "Bad state"
 
 	(* deal takes in the current_st g_state and the current deck ref (deck) and
-	   updates the inputted state with hands *)
+	 * updates the inputted state with hands *)
 	let deal g_state deck = () 
 		let deal g_state deck = 
 		(* step 1: make sure deck has enough cards *)

@@ -27,7 +27,7 @@ module Game_Engine = struct
 		mutable c_player : int;
 		mutable hands : (int * hand) list; 
 		mutable bets : int array;
-		mutable p_statuses : bool array;
+		mutable players_in : bool array;
 	}
 
 	exception GameEnded
@@ -37,7 +37,8 @@ module Game_Engine = struct
 
 	let deck = ref [] 
 	let state = ref {current_st = START; cards_in_play = []; pot = 0;
-		current_bet = 0; n_players = 0; c_player = 0; hands = []}
+		current_bet = 0; n_players = 0; c_player = 0; hands = []; 
+		bets = [||]; players_in = [||]}
 
 	let suit_print suit =
 		match suit with 
@@ -139,31 +140,9 @@ module Game_Engine = struct
 				g_state.current_st <- END else g_state.current_st <- DEAL
 			| END -> failwith "Bad"
 
+	(* increments a ref *)
 	let mutable_incr i = 
 		i := !i + 1
-
-
-	(* DO WE NEED A LIST THAT KEEPS TRACK OF WHAT EACH PLAYER HAS BET?
-		HOW ARE WE KEEPING TRACK OF WHO HAS ALREADY BET? IF someone raises
-		a bet, then how do we account for that in switch? Why don't we just input g_state entirely
-		instead of c_player? Does the signal_bet function even depend on which
-		player is being prompted? *)
-
-	(* This is what current player (c_player) is for. It's the index of the player whose
-   * turn it is to bet. Notice how we go through each player in signal bet. *)
-
-   (* But all we do is iterate through all the players once. What happens in a 
-   a player other than the first player bets, or multiple players bet in a round?
-   we should be giving all other players a chance to get after one player has made a bet 
-
-	The problem with not keeping track of what each player has bet also arises from this
-	opportunity to bet multiple times. How are we keeping track of how much more a player
-	is adding to the pot? Say the first player bet a little, the second player bets more,
-	and the third player bets even more. Everyone gets a chance to match that third player's
-	bet, but the first and second players have already bet a little bit, and different amounts.
-	How do we make sure they dont overbet? I think we need a list to keep track of that. It would
-	also make it easier to display how much everyone has bet on our GUI because we could 
-	just access a preexisting list rather than trying to figure out how to do that later *)
 
 	(* Signals bets to the players. *)
 	let rec signal_bet g_state (* current_player *) = 
@@ -234,7 +213,11 @@ module Game_Engine = struct
 		transition_state g_state;
 		deal g_state deck; 
 
-		(* FOR NOW: Deal flop, then bet. *)
+		(* Bet after dealing. BET_ZERO state, transition to flop *)
+		switch g_state;
+		transition_state g_state;
+
+		(* FOR NOW: Deal flop, then bet (taken care of in flop). Move on to turn *)
 		flop g_state;
 		switch g_state;
 

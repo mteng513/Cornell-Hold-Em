@@ -132,7 +132,7 @@ module Game_Engine = struct
 		match g_state.current_st with
 			| START -> g_state.current_st <- DEAL 
 			| DEAL -> g_state.current_st <- BET_ZERO
-			| BET_ZER0 -> g_state.current_st <- BET_ONE
+			| BET_ZERO -> g_state.current_st <- BET_ONE
 			| BET_ONE -> g_state.current_st <- BET_TWO
 			| BET_TWO -> g_state.current_st <- BET_THREE
 			| BET_THREE -> g_state.current_st <- SCORE

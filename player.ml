@@ -1,4 +1,5 @@
 (* Ml file for the player *)
+open Gengine
 
 module Player = struct
 
@@ -16,6 +17,9 @@ module Player = struct
 		failwith "Unimplemented"
 
 	let check () = 
+		failwith "Unimplemented"
+
+	let state_getter () = 
 		failwith "Unimplemented"
 		
 end 

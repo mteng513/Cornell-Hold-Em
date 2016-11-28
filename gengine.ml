@@ -144,6 +144,27 @@ module Game_Engine = struct
     	(!f_list) @ (!e_list) @ (!g_list);
     cut ()
 
+    (* SORT HAND *)
+	(* !state.cards_in_play @ player hand *)
+	let sort_cards (h:hand) : hand = 
+		List.sort Pervasives.compare h
+
+	(* [flush hand]
+	 * Returns the sorted card list, in ascending order of rank,
+	 * containing the flush if there is one (may exceed 5 cards if 6 or all cards have same suit).
+	 * Otherwise, returns the empty list.
+	 *)
+	let flush (hand: hand) = 
+		let h = sort_cards hand in 
+		if (List.(h |> filter (fun x -> snd x = snd(List.hd h))|> length) >= 5) then 
+			List.(h |> filter (fun x -> snd x = snd(List.hd h)))
+		else if (List.(h |> filter (fun x -> snd x = snd(List.nth h 1)) |> length) >= 5) then
+			List.(h |> filter (fun x -> snd x = snd(List.nth h 1)))
+		else if (List.(h |> filter (fun x -> snd x = snd(List.nth h 2)) |> length) >= 5) then
+			List.(h |> filter (fun x -> snd x = snd(List.nth h 2)))
+		else 
+			[]
+
     (* This function takes in the current_st g_state (POTENTIALLY NEEDS MORE INPUTS)
      * and updates the winning players scores with the points they won from the
  	 * pot. Returns a unit *)

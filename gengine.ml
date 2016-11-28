@@ -119,6 +119,9 @@ module Game_Engine = struct
     shuffle_helper deck a_list b_list; 
     deck := (!b_list) @ (!a_list)
 
+    (* This function takes in the current_st g_state (POTENTIALLY NEEDS MORE INPUTS)
+     * and updates the winning players scores with the points they won from the
+ 	 * pot. Returns a unit *)
 	let score g_state = 
 		failwith "Unimplemented"
 
@@ -141,7 +144,9 @@ module Game_Engine = struct
 
 	let get_state () = state 
 
-	(* Signals bets to the players. *)
+	(* Signals bets to the players. 
+	 * Takes in the current_st g_state, makes necessary updates to g_state,
+	 * and then returns unit*)
 	let rec signal_bet g_state (* current_player *) = 
 		print_endline ("Place your bet. 
 			The current bet is " ^ (string_of_int g_state.current_bet));
@@ -166,9 +171,9 @@ module Game_Engine = struct
 	let rec index_in_array a e index_acc =
 		if a.(index_acc) = e 
 		then index_acc 
-		else index_in_array a e (index_acc+1)
+		else index_in_array a e (index_acc + 1)
 	
-	(* takes in an array and returns the greatest array element value *)
+	(* takes in an array bets and returns the greatest array element value *)
 	let rec max_of_array bets =
 		let len = Array.length bets in
 		match bets with
@@ -182,9 +187,7 @@ module Game_Engine = struct
 
 
 	(* gets the index of the max element in an int array. Takes in the 
-	 * int array, bets, and the current_high accumulator of type int*int where
-	 * the first int is the value and the second int is the index of the actual
-	 * int in the array *)
+	 * int array bets and returns index of the greatest element in the array *)
 	let rec index_of_max (bets: int array) : int =
 		let max_element = max_of_array bets in
 		index_in_array bets max_element 0 

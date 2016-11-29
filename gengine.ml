@@ -163,6 +163,41 @@ module Game_Engine = struct
 		else 
 			[]
 
+	(* BEGIN STRAIGHT CALC *)
+	let make_enum_rank rank = 
+		match rank with 
+		| Two -> 2
+		| Three -> 3
+		| Four -> 4
+		| Five -> 5
+		| Six -> 6
+		| Seven -> 7
+		| Eight -> 8
+		| Nine -> 9
+		| Ten -> 10
+		| Jack -> 11
+		| Queen -> 12
+		| King -> 13
+		| Ace -> 14
+
+	(* Returns sorted an int list in ascending order*)
+	let rec make_enum_hand (h: hand) acc = 
+		match h with 
+		|[] -> List.sort Pervasives.compare acc
+		|(rank, suit)::t -> make_enum_hand t (make_enum_rank rank::acc)
+
+	(* [straight hand]
+	 * 
+	 *
+	 *)
+	let straight (hand: hand) = 
+		(* If either are false then we know we don't have a flush *)
+		(List.mem_assoc Five hand) (List.mem_assoc Ten hand) 
+		(* Ace 2 3 4 5 valid, 10 Jack Queen King Ace valid, if latter case + flush then royal flush *)
+		
+		(* If not [] then we have a straight flush, otherwise just a straight *)
+
+
     (* This function takes in the current_st g_state (POTENTIALLY NEEDS MORE INPUTS)
      * and updates the winning players scores with the points they won from the
  	 * pot. Returns a unit *)

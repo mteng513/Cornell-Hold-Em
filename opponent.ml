@@ -9,6 +9,7 @@ module Opponent = struct
 
   type difficulty = One | Two | Three 
 
+  (* Returns true, bet amt for SUITED cards *)
   let suit_helper (c1 : rank) (c2 : rank) = 
   	match (c1, c2) with 
   		| (l, r) when (l = r) ->
@@ -57,8 +58,9 @@ module Opponent = struct
   				| (Four, Five) -> (true, Random.int 30)
   				| _ -> (true, 20))
 
-  		| _ -> failwith "Bad"
+  		| _ -> failwith "Bad cards"
 
+  (* Returns true, bet amt based on the rank of the two UNSUITED cards. *)
   let unsuit_helper (c1 : rank) (c2 : rank) = 
   	match (c1, c2) with 
   		| (l, r) when (l = r) -> 
@@ -79,29 +81,32 @@ module Opponent = struct
 
   		| (l, r) when (l <> r) ->
   			(match (l, r) with 
-  				| (Ace, King) -> (true, (Random.int 300))
-  				| (Ace, Queen) -> (true, (Random.int 200))
-  				| (Ace, Jack) -> (true, (Random.int 100))
-  				| (Ace, Ten) -> (true, (Random.int 80))
-  				| (Ace, Nine) -> (true, (Random.int 50))
-  				| (Ace, Eight) -> (true, (Random.int 30))
-  				| (King, Queen) -> (true, (Random.int 200))
-  				| (King, Jack) -> (true, (Random.int 175))
-  				| (King, Ten) -> (true, (Random.int 150))
-  				| (King, Nine) -> (true, (Random.int 90))
-  				| (Queen, Jack) -> (true, (Random.int 150))
-  				| (Queen, Ten) -> (true, (Random.int 150))
-  				| (Jack, Ten) -> (true, (Random.int 250))
-  				| (Ten, Nine) -> (true, (Random.int 150))
-  				| (Ten, Eight) -> (true, (Random.int 130))
-  				| (Ten, Seven) -> (true, (Random.int 110))
-  				| (Ten, Six) -> (true, (Random.int 100))
-  				| (Nine, Eight) -> (true, (Random.int 130))
-  				| (Nine, Seven) -> (true, (Random.int 115))
+  				| (King, Ace) -> (true, (Random.int 300))
+  				| (Queen, Ace) -> (true, (Random.int 200))
+  				| (Jack, Ace) -> (true, (Random.int 100))
+  				| (Ten, Ace) -> (true, (Random.int 80))
+  				| (Nine, Ace) -> (true, (Random.int 50))
+  				| (Eight, Ace) -> (true, (Random.int 30))
+  				| (Queen, King) -> (true, (Random.int 200))
+  				| (Jack, King) -> (true, (Random.int 175))
+  				| (Ten, King) -> (true, (Random.int 150))
+  				| (Nine, King) -> (true, (Random.int 90))
+  				| (Jack, Queen) -> (true, (Random.int 150))
+  				| (Ten, Queen) -> (true, (Random.int 150))
+  				| (Ten, Jack) -> (true, (Random.int 250))
+  				| (Nine, Ten) -> (true, (Random.int 150))
+  				| (Eight, Ten) -> (true, (Random.int 130))
+  				| (Seven, Ten) -> (true, (Random.int 110))
+  				| (Six, Ten) -> (true, (Random.int 100))
+  				| (Eight, Nine) -> (true, (Random.int 130))
+  				| (Seven, Nine) -> (true, (Random.int 115))
   				| _ -> (false, 0))
 
-  		| _ -> failwith "Bad"
-  				
+  		| _ -> failwith "Bad cards"
+  	
+ 	(* Helper function for the first round of betting that separates
+ 	 * into whether the opponent has suited or unsuited cards, then
+ 	 * punts to the respective helper. *)
   let b0_helper2 card1 card2 = 
   	match card1, card2 with
   		| (c1, s1), (c2, s2) when (s1 = s2) -> 
@@ -118,21 +123,26 @@ module Opponent = struct
 
   		| _ -> ignore (bet (Random.int 100))
 
-  let bet_zero_helper hand = 
+  (* Main helper function for the first betting round, with two cards. *)
+  let bet_zero_helper (hand : card list) = 
   	match hand with 
-  		| (c1, c2) -> b0_helper2 c1 c2
+  		| (c1::c2::[]) -> b0_helper2 c1 c2
+  		| _ -> failwith "Failure: Bet zero"
 
+  (* Computes the max of 4 numbers. *)
   let four_max a b c d = 
   	let max = ref a in 
     if (b > !max) then 
-        max := b else 
+        max := b else  
     if (c > !max) then 
         max := c else 
     if (d > !max) then 
         max := d
-    else (failwith "Bad");
+    else (failwith "Failure: four_max");
  		!max
 
+ 	(* Returns true if there is a flush or there is a high possibility 
+ 	 * of a flush. *)
   let flush lst = 
   	let c1 = ref 0 in let c2 = ref 0 in let c3 = ref 0 in let c4 = ref 0 in 
   	(for i = 0 to (List.length lst) do 
@@ -148,19 +158,34 @@ module Opponent = struct
   		| (4) -> true
   		| _ -> false
 
-  let flop_better cardlst = 
+  (* General helper for bets after the first. *)
+  let bet_helper cardlst = 
   	if (flush cardlst) then ignore (bet (Random.int 750))
   	else check ()
 
+  (* Sorts cards by RANK. *)
+  let sort_cards (h:hand) : hand = 
+		List.sort Pervasives.compare h
 
-  let bet_one_helper hand play_cards = 
-  	flop_better (hand @ play_cards)
 
+	(* Main decision function for the opponent. *)
   let decide () = 
   	let st = get_state () in 
-  	match !st.current_st with
-  		| BET_ZERO -> (false, 0)
-  		| _ -> (false, 0)
+  	let player_index = !st.c_player in 
+  	let hands = !st.hands in 
+
+  	match (List.nth hands player_index) with 
+  		| (i, (c1::c2::[])) -> let hand = (c1::c2::[]) in 
+
+  		(match !st.current_st with
+  			| BET_ZERO -> bet_zero_helper (sort_cards hand)
+  			| BET_ONE -> bet_helper (sort_cards (hand @ !st.cards_in_play))
+  			| BET_TWO -> bet_helper (sort_cards (hand @ !st.cards_in_play))
+  			| BET_THREE -> bet_helper (sort_cards (hand @ !st.cards_in_play))
+  			| _ -> ())
+
+  		| _ -> failwith "Failure: bad hand"
+
 
 
 

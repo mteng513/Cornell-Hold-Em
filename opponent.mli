@@ -16,7 +16,7 @@ module Opponent : sig
 	 * (unpredictable) way. The only difference between
 	 * the player and the AI is that the AI needs to make
 	 * the betting decisions. *)
-	val decide : unit -> (bool * int) 
+	val decide : unit -> unit
 
 
 

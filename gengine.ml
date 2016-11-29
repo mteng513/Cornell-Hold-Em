@@ -38,39 +38,48 @@ module Game_Engine = struct
 		current_bet = 0; n_players = 0; c_player = 0; hands = []; 
 		bets = [||]; players_in = [||]}
 
-	let suit_print suit =
+	(* [suit_to_string suit] takes in a suit [suit] and returns its
+	 * string representation formatted for printing *)
+	let suit_to_string (suit: suit) : string =
 		match suit with 
 			| Clarkson -> "Clarkson "
 			| Gries -> "Gries "
 			| Dijkstra -> "Dijkstra "
 			| George -> "George "
 
-	let print_helper ele = 
+	(* [card_to_string ele] takes in a card [ele] and returns its
+	 * string representation formatted for printing *)
+	let card_to_string (ele: card) : string = 
 		match ele with  
-			| (Two, suit) -> "Two of " ^ suit_print suit
-			| (Three, suit) -> "Three of " ^ suit_print suit
-			| (Four, suit) -> "Four of " ^ suit_print suit
-			| (Five, suit) -> "Five of " ^ suit_print suit
-			| (Six, suit) -> "Six of " ^ suit_print suit
-			| (Seven, suit) -> "Seven of " ^ suit_print suit
-			| (Eight, suit) -> "Eight of " ^ suit_print suit
-			| (Nine, suit) -> "Nine of " ^ suit_print suit
-			| (Ten, suit) -> "Ten of " ^ suit_print suit
-			| (Jack, suit) -> "Jack of " ^ suit_print suit
-			| (Queen, suit) -> "Queen of " ^ suit_print suit
-			| (King, suit) -> "King of " ^ suit_print suit
-			| (Ace, suit) -> "Ace of " ^ suit_print suit
+			| (Two, suit) -> "Two of " ^ suit_to_string suit
+			| (Three, suit) -> "Three of " ^ suit_to_string suit
+			| (Four, suit) -> "Four of " ^ suit_to_string suit
+			| (Five, suit) -> "Five of " ^ suit_to_string suit
+			| (Six, suit) -> "Six of " ^ suit_to_string suit
+			| (Seven, suit) -> "Seven of " ^ suit_to_string suit
+			| (Eight, suit) -> "Eight of " ^ suit_to_string suit
+			| (Nine, suit) -> "Nine of " ^ suit_to_string suit
+			| (Ten, suit) -> "Ten of " ^ suit_to_string suit
+			| (Jack, suit) -> "Jack of " ^ suit_to_string suit
+			| (Queen, suit) -> "Queen of " ^ suit_to_string suit
+			| (King, suit) -> "King of " ^ suit_to_string suit
+			| (Ace, suit) -> "Ace of " ^ suit_to_string suit
 
-	let rec formatted_print lst = 
+	(* [formatted_print lst] takes in a card list [lst] and returns a
+	 * formatted string containing info on all of the cards in the list *)
+	let rec formatted_print (lst: card list) : string = 
 		match lst with 
 			| [] -> ""
-			| h::t -> (print_helper h) ^ formatted_print t
+			| h::t -> (card_to_string h) ^ formatted_print t
 
+	(* [printc lst] take in a card list [lst] and converts it into a formatted
+	 * string using formatted_print and then prints the string. Returns unit *)
 	let printc lst =
 		print_endline (formatted_print lst)
 
-	(* Deck reset function. Sets the deck back to normal state. *)
-	let reset_deck () = deck := 
+	(* [reset_deck] resets the deck back to normal, full, ordered 52-card 
+	 * state, just like a freshly opened deck of cards. Returns a unit *)
+	let reset_deck () : unit = deck := 
 		[(Two, Clarkson); (Three, Clarkson); (Four, Clarkson); 
 		(Five, Clarkson); (Six, Clarkson); (Seven, Clarkson); 
 		(Eight, Clarkson); (Nine, Clarkson); (Ten, Clarkson); (Jack, Clarkson);
@@ -89,12 +98,14 @@ module Game_Engine = struct
 		(Ace, George);
 		]
 
-	(* Pushes an element onto a ref list *)
-	let push lst ele = 
+	(* [push lst ele] prepends an element [ele] onto a list ref [lst]. 
+	 * Returns unit*)
+	let push (lst: 'a list ref) (ele: 'a): unit = 
 		lst := ele::!lst
 
-	(* Pops an element off of a ref list *)
-	let pop lst = 
+	(* [pop lst] Pops an element off of a 'a list ref [lst] and returns that
+	 * popped element of type 'a *)
+	let pop (lst: 'a list ref) : 'a = 
 		match !lst with
 			| [] -> failwith "no more card in the deck"
 			| h::t -> lst := t; h 
@@ -144,18 +155,23 @@ module Game_Engine = struct
 
     (* SORT HAND *)
 	(* !state.cards_in_play @ player hand *)
+	
+	(* [sort_card hand] takes in a hand [hand] and returns a hand, sorted using
+	 * List.sort Pervasives.compare on the hand *)
 	let sort_cards (h:hand) : hand = 
 		List.sort Pervasives.compare h
 
-	let filter_suit hand i = 
+	(* [filter_suit hand i] takes in a hand [hand] and an int [i] and filters
+	 * out all cards from [hand] of number [i]. Returns the filtered hand *)
+	let filter_suit (hand: hand) (i: int) : hand = 
 	List.(hand |> filter (fun x -> snd x = snd(List.nth hand i)))
 
-	(* [flush hand]
+	(* [flush hand] takes in a hand [hand],
 	 * Returns the sorted card list, in ascending order of rank,
 	 * containing the flush if there is one (may exceed 5 cards if 6 or all cards have same suit).
 	 * Otherwise, returns the empty list.
 	 *)
-	let flush (hand: hand) = 
+	let flush (hand: hand) : hand = 
 		let h = sort_cards hand in 
 		if ((filter_suit h 0) |> List.length) >= 5 then 
 			filter_suit h 0
@@ -167,7 +183,9 @@ module Game_Engine = struct
 			[]
 
 	(* BEGIN STRAIGHT CALC *)
-	let make_enum_rank rank = 
+	(* [make_enum_rank rank] takes in [rank] of type rank and returns the int
+	 * that corresponds to that rank *)
+	let make_enum_rank (rank: rank) : int = 
 		match rank with 
 		| Two -> 2
 		| Three -> 3
@@ -183,36 +201,43 @@ module Game_Engine = struct
 		| King -> 13
 		| Ace -> 14
 
-	(* Returns sorted an int list in ascending order*)
-	let rec make_enum_hand (h: hand) acc = 
+	(* [make_enum_hand hand acc] Returns sorted an int list in ascending order.
+	 * Takes in hand [h] and the int list accumulator acc, generally designed
+	 * to take in an empty list that accumulates ints. Returns that int list *)
+	let rec make_enum_hand (h: hand) (acc: int list) : int list = 
 		match h with 
 		|[] -> List.sort Pervasives.compare acc
 		|(rank, suit)::t -> make_enum_hand t (make_enum_rank rank::acc)
 
-	let rec straight_hand (hand: hand) (pat: int) (acc) =
+	(* [straight_hand hand pat acc] returns the sorted straight hand, takes in: 
+	 * [hand] of type hand which is a 7 card hand including the dealt cards and 
+	 * the cards in play, [pat] of type int that indicates which pattern of a
+	 * straight the hand is, and an accumulator [acc] of type hand that 
+	 * recursively accumulates the cards in order from least to greatest *)
+	let rec straight_hand (hand: hand) (pat: int) (acc: hand): hand =
 		let len = List.length acc in
 		match pat with
-		| 1 when len < 5 -> straight_hand hand pat ((List.nth hand (2 + len)) :: acc)  
-		| 2 when len < 5 -> straight_hand hand pat ((List.nth hand (1 + len)) :: acc)
-		| 3 when len < 5 -> straight_hand hand pat ((List.nth hand (0 + len)) :: acc)
-		| 4 -> (List.nth hand 0)::(List.nth hand 1)::(List.nth hand 2)::(List.nth hand 3)::(List.nth hand 6)::[]
+		| 1 when len < 5 -> 
+					straight_hand hand pat ((List.nth hand (6 - len)) :: acc)
+		| 2 when len < 5 -> 
+					straight_hand hand pat ((List.nth hand (5 - len)) :: acc)
+		| 3 when len < 5 -> 
+					straight_hand hand pat ((List.nth hand (4 - len)) :: acc)
+		| 4 -> (List.nth hand 0)::(List.nth hand 1)::(List.nth hand 2)
+				::(List.nth hand 3)::(List.nth hand 6)::[]
 		| _ -> acc
 	
-	(* Returns the best straight in a given hand, if one exists *)
-	(* let make_straight_hand (hand: hand) (pat: int) =
-		match pat with
-		| 1 -> (List.nth hand 2) :: List.nth hand 3 :: List.nth hand 4 :: List.nth hand 
-		| 2 -> 
-		| 3 -> 
-		| 4 ->  *)
-	let are_consec a b c d e =
+	(* [are_consec a b c d e] returns a bool and takes in 5 ints, [a], [b],  
+	 * [c], [d], and [e] and checks if they are consecutive, meaning 
+	 * consecutively 1 more than the last. If so, then returns true, 
+	 * else returns false *)
+	let are_consec (a:int) (b:int) (c:int) (d:int) (e:int) : bool =
 		if (a+1=b) && (b+1=c) && (c+1=d) && (d+1=e) then true else false  
-	(* [straight hand]
-	 * 
-	 *
-	 *
-	 *)
-	let straight hand = 
+	
+	(* [straight hand] takes in a [hand] of type hand and returns the 
+	 * hand of the 5 cards making up the straight, sorted lowest to 
+	 * highest *)
+	let straight (hand: hand) : hand = 
 		let card_values = make_enum_hand hand [] in 
 		match card_values with
 		| _ :: _ ::a::b::c::d::e::[] when are_consec a b c d e -> straight_hand hand 1 []
@@ -220,29 +245,6 @@ module Game_Engine = struct
 		| a::b::c::d::e::_::_::[] when are_consec a b c d e -> straight_hand hand 3 []
 		| 2::3::4::5::_::_::14::[] -> straight_hand hand 4 []
 		| _ -> [] 		
-
-
-		(* match card_values with
-		| _ :: _ ::h::(h+1)::(h+2)::(h+3)::(h+4)::[] -> straight_hand hand 1 []
-		| _ ::h::(h+1)::(h+2)::(h+3)::(h+4):: _ ::[] -> straight_hand hand 2 []
-		| h::(h+1)::(h+2)::(h+3)::(h+4)::_::_::[] -> straight_hand hand 3 []
-		| 2::3::4::5::_::_::14] -> straight_hand hand 4 []
-		| _ -> [] 
- *)
-
-		(* | _::_::h::(h+1)::(h+2)::(h+3)::(h+4)::[]] -> straight_hand hand 1 []
-		| [_; x; x+1; x+2; x+3; x+4; _] -> straight_hand hand 2 []
-		| [x; x+1; x+2; x+3; x+4, _; _] -> straight_hand hand 3 []
-		| [2; 3; 4; 5; _; _; 14] -> straight_hand hand 4 []
-		| _ -> [] *)
-
-
-
-		(* If either are false then we know we don't have a flush *)
-		(* (List.mem_assoc Five hand) (List.mem_assoc Ten hand)  *)
-		(* Ace 2 3 4 5 valid, 10 Jack Queen King Ace valid, if latter case + flush then royal flush *)
-		
-		(* If not [] then we have a straight flush, otherwise just a straight *)
 
 	(* BEGIN 4Kind 3Kind PAIR CALC *)
 	let filter_rank hand i = 
@@ -262,13 +264,16 @@ module Game_Engine = struct
 		|_,_,_,4 -> filter_rank h 3
 		|_ -> []
 
-    (* This function takes in the current_st g_state (POTENTIALLY NEEDS MORE INPUTS)
+    (* [score g_state] takes in the global_state [g_state] (POTENTIALLY NEEDS MORE INPUTS)
      * and updates the winning players scores with the points they won from the
  	 * pot. Returns a unit *)
-	let score g_state = 
+	let score (g_state : global_state) : unit = 
 		failwith "Unimplemented"
 
-	let transition_state g_state = 
+	(* [transition_state g_state] takes in the global_state [g_state] and 
+	 * transitions its current_st property to the next current_st of type
+	 * current_state. Returns unit*)
+	let transition_state (g_state : global_state) : unit = 
 		ignore (g_state.c_player <- 0);
 		match g_state.current_st with
 			| START -> g_state.current_st <- DEAL 
@@ -281,16 +286,17 @@ module Game_Engine = struct
 				g_state.current_st <- END else g_state.current_st <- DEAL
 			| END -> failwith "Bad"
 
-	(* increments an int ref *)
-	let mutable_incr i = 
+	(* [mutable_incr i] increments an int ref [i], returns unit*)
+	let mutable_incr (i: int ref) : unit = 
 		i := !i + 1
 
-	let get_state () = state 
+	(* [get_state ()] returns the global_state reference, state *)
+	let get_state () : global_state ref = state 
 
-	(* Signals bets to the players. 
-	 * Takes in the current_st g_state, makes necessary updates to g_state,
-	 * and then returns unit*)
-	let rec signal_bet g_state (* current_player *) = 
+	(* [signal_bet g_state] signals bets to the players. 
+	 * Takes in the current_st [g_state], makes necessary updates to g_state,
+	 * and then returns unit *)
+	let rec signal_bet (g_state : global_state) (* current_player *) = 
 		print_endline ("Place your bet. 
 			The current bet is " ^ (string_of_int g_state.current_bet));
 		let bet = read_int () in
@@ -308,16 +314,17 @@ module Game_Engine = struct
 		| _ -> print_endline "invalid input received. try again"; 
 							signal_bet g_state
 
-	(* takes in array a, element e, and the index accumulator index_acc.
-	 * returns the index of element e in array a. 
-	 * The index_acc should start at 0, or at whatever point you want to start *)
-	let rec index_in_array a e index_acc =
+	(* [index_in_array a e index_acc] takes in array [a], element [e], and the
+	 * index accumulator int [index_acc]. returns the index of element e in 
+	 * array a. The index_acc should start at 0/the desired starting point *)
+	let rec index_in_array (a: 'a array) (e: 'a) (index_acc: int) : int =
 		if a.(index_acc) = e 
 		then index_acc 
 		else index_in_array a e (index_acc + 1)
 	
-	(* takes in an array bets and returns the greatest array element value *)
-	let rec max_of_array bets =
+	(* [max_of_array bets] takes in an array [bets] and returns the greatest
+	 * array element value *)
+	let rec max_of_array (bets: 'a array) : 'a =
 		let len = Array.length bets in
 		match bets with
 		| [||] -> 0
@@ -329,19 +336,18 @@ module Game_Engine = struct
 		| _ -> failwith "wtf is going on"
 
 
-	(* gets the index of the max element in an int array. Takes in the 
-	 * int array bets and returns index of the greatest element in the array *)
+	(* [index_of_max bets] gets the index of the max element in an int array. 
+	 * Takes in the int array [bets] and returns int index of the greatest 
+	 * element in the array *)
 	let rec index_of_max (bets: int array) : int =
 		let max_element = max_of_array bets in
 		index_in_array bets max_element 0 
 
-	(* Called in after deal and each bet stage to signal bets to
-	 * all the players. *)
-	let switch g_state = 
+	(* [switch g_state] is called in after deal and each bet stage to signal bets to
+	 * all the players. Takes in global_state [g_state], returns unit*)
+	let switch (g_state : global_state) : unit = 
 		match g_state.current_st with 
 			| BET_ZERO | BET_ONE | BET_TWO | BET_THREE ->
-				(* I think this needs to be a while loop until you reach the player who set the highest bet
-				We also need to make sure we don't go through players that have folded *)
 				(while not (g_state.c_player = index_of_max g_state.bets) do 
 					signal_bet g_state; 
 					g_state.c_player <- g_state.c_player + 1; done);
@@ -350,10 +356,10 @@ module Game_Engine = struct
 				transition_state g_state;
 			| _ -> failwith "Bad state"
 
-	(* deal takes in the current_st g_state and the current deck ref (deck) and
-	 * updates the inputted state with hands *)
-	let deal g_state deck = () 
-		let deal g_state deck = 
+	(* [deal g_state deck] takes in the current_st [g_state] and the current 
+	 * deck ref [deck] and updates the state with the hands. returns unit *)
+	let deal (g_state : global_state) (deck: deck ref) : unit = (* ()
+		let deal g_state deck =  *)
 		(* step 1: make sure deck has enough cards *)
 		(if List.length !deck < (g_state.n_players+5) 
 		then (reset_deck (); shuffle ())
@@ -366,21 +372,33 @@ module Game_Engine = struct
 		(*step 3: MAYBE?!?!?! change state to BET_ONE*) 
 		transition_state g_state *)
 
-	let flop g_state = 
+	(* [flop g_state] takes in the global_state [g_state] and updates it with
+	 * the flop stage of the game. it draws and plays the 3 cards revealed in 
+	 * the flop stage. Returns unit *)
+	let flop (g_state : global_state) : unit = 
 		g_state.cards_in_play <- pop deck::g_state.cards_in_play;
 		g_state.cards_in_play <- pop deck::g_state.cards_in_play;
 		g_state.cards_in_play <- pop deck::g_state.cards_in_play;
 		printc (g_state.cards_in_play)
 
-	let turn g_state = 
+	(* [turn g_state] takes in the global_state [g_state] and updates it with
+	 * the turn stage of the game. it draws and plays the card revealed in 
+	 * the turn stage. Returns unit *)
+	let turn (g_state : global_state) : unit = 
 		g_state.cards_in_play <- pop deck::g_state.cards_in_play;
 		printc (g_state.cards_in_play)
 
-	let river g_state = 
+	(* [river g_state] takes in the global_state [g_state] and updates it with
+	 * the river stage of the game. it draws and plays the card revealed in 
+	 * the river stage. Returns unit *)
+	let river (g_state : global_state) : unit = 
 		g_state.cards_in_play <- pop deck::g_state.cards_in_play;
 		printc (g_state.cards_in_play)
 
-	let game_loop g_state = 
+	(* [game_loop g_state] takes in the global_state [g_state] and updates it
+	 * as the game goes along. Terminates when a player has won the game
+	 *  *)
+	let rec game_loop (g_state : global_state) : unit = 
 		(* Transition to the deal stage. Deal. *)
 		transition_state g_state;
 		deal g_state deck; 

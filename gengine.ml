@@ -264,35 +264,14 @@ module Game_Engine = struct
 		|_,_,_,4 -> filter_rank h 3
 		|_ -> []
 
-	
-	let hand_type (hand: hand) : string =
-		match hand with
-		| hand when is_royal_flush hand = true -> "Royal Flush"
-		| hand when is_straight_flush hand = true -> "Straight Flush"
-
-
-	(* [hand_score hand_type hand] takes in a hand type string [hand_type],
-	 * a hand [hand], and then computes the score of the given hand type. 
-	 * Returns int of the score *)
-    let hand_score (hand_type: string) (hand: hand) : int =
-    	match hand_type with
-    	| "Royal Flush"  -> 100000000000000000000
-    	| "Straight Flush" ->
-    	| "Four of a Kind" ->
-    	| "Full House" ->
-    	| "Flush" ->
-    	| "Straight" ->
-    	| "Three of a Kind" ->
-    	| "Two Pair" ->
-    	| "Pair" -> make_enum_rank
-    	| "High Card" -> make_enum_rank (fst (List.nth test_list (List.length test_list - 1)))
 
     (* [score g_state] takes in the global_state [g_state] (POTENTIALLY NEEDS MORE INPUTS)
      * and updates the winning players scores with the points they won from the
  	 * pot. Returns a unit *)
 	let score (g_state : global_state) : unit = 
 		match g_state.players_in with
-		| a, b, c, d, e, f, g, h -> () 
+		| [|a; b; c; d; e; f; g; h|] -> () 
+		| _ -> ()
 
 		
 

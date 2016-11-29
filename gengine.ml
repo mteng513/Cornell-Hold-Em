@@ -189,13 +189,57 @@ module Game_Engine = struct
 		|[] -> List.sort Pervasives.compare acc
 		|(rank, suit)::t -> make_enum_hand t (make_enum_rank rank::acc)
 
+	let rec straight_hand (hand: hand) (pat: int) (acc) =
+		let len = List.length acc in
+		match pat with
+		| 1 when len < 5 -> straight_hand hand pat ((List.nth hand (2 + len)) :: acc)  
+		| 2 when len < 5 -> straight_hand hand pat ((List.nth hand (1 + len)) :: acc)
+		| 3 when len < 5 -> straight_hand hand pat ((List.nth hand (0 + len)) :: acc)
+		| 4 -> (List.nth hand 0)::(List.nth hand 1)::(List.nth hand 2)::(List.nth hand 3)::(List.nth hand 6)::[]
+		| _ -> acc
+	
+	(* Returns the best straight in a given hand, if one exists *)
+	(* let make_straight_hand (hand: hand) (pat: int) =
+		match pat with
+		| 1 -> (List.nth hand 2) :: List.nth hand 3 :: List.nth hand 4 :: List.nth hand 
+		| 2 -> 
+		| 3 -> 
+		| 4 ->  *)
+	let are_consec a b c d e =
+		if (a+1=b) && (b+1=c) && (c+1=d) && (d+1=e) then true else false  
 	(* [straight hand]
 	 * 
 	 *
+	 *
 	 *)
-	let straight (hand: hand) = 
+	let straight hand = 
+		let card_values = make_enum_hand hand [] in 
+		match card_values with
+		| _ :: _ ::a::b::c::d::e::[] when are_consec a b c d e -> straight_hand hand 1 []
+		| _ ::a::b::c::d::e:: _ ::[] when are_consec a b c d e -> straight_hand hand 2 []
+		| a::b::c::d::e::_::_::[] when are_consec a b c d e -> straight_hand hand 3 []
+		| 2::3::4::5::_::_::14::[] -> straight_hand hand 4 []
+		| _ -> [] 		
+
+
+		(* match card_values with
+		| _ :: _ ::h::(h+1)::(h+2)::(h+3)::(h+4)::[] -> straight_hand hand 1 []
+		| _ ::h::(h+1)::(h+2)::(h+3)::(h+4):: _ ::[] -> straight_hand hand 2 []
+		| h::(h+1)::(h+2)::(h+3)::(h+4)::_::_::[] -> straight_hand hand 3 []
+		| 2::3::4::5::_::_::14] -> straight_hand hand 4 []
+		| _ -> [] 
+ *)
+
+		(* | _::_::h::(h+1)::(h+2)::(h+3)::(h+4)::[]] -> straight_hand hand 1 []
+		| [_; x; x+1; x+2; x+3; x+4; _] -> straight_hand hand 2 []
+		| [x; x+1; x+2; x+3; x+4, _; _] -> straight_hand hand 3 []
+		| [2; 3; 4; 5; _; _; 14] -> straight_hand hand 4 []
+		| _ -> [] *)
+
+
+
 		(* If either are false then we know we don't have a flush *)
-		(List.mem_assoc Five hand) (List.mem_assoc Ten hand) 
+		(* (List.mem_assoc Five hand) (List.mem_assoc Ten hand)  *)
 		(* Ace 2 3 4 5 valid, 10 Jack Queen King Ace valid, if latter case + flush then royal flush *)
 		
 		(* If not [] then we have a straight flush, otherwise just a straight *)

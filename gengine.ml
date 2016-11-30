@@ -248,7 +248,7 @@ module Game_Engine = struct
 
 	(* BEGIN 4Kind 3Kind PAIR CALC *)
 	let filter_rank hand i = 
-	List.(hand |> filter (fun x -> fst x = fst(List.nth hand i)))
+		List.(hand |> filter (fun x -> fst x = fst(List.nth hand i)))
 
 	(* [four_kind hand] *)
 	let rec four_kind (hand: hand) = 
@@ -262,6 +262,14 @@ module Game_Engine = struct
 				if (filter_rank h 0 |> List.length) = 4 then filter_rank h 0 
 				else four_kind t
 
+	(* full_house [hand] *)
+	let full_house (hand: hand) = 
+		let h = List.rev (sort_cards hand) in 
+		if not (three_kind h = []) then 
+			three_kind h @ pair (List.(h |> filter (fun x -> fst x != fst(List.hd h))))
+		else 
+			[]
+			
 	(* [three_kind hand] *)
 	let rec three_kind (hand: hand) = 
 		let h = List.rev (sort_cards hand) in
@@ -273,6 +281,14 @@ module Game_Engine = struct
 			|_::t-> 
 				if (filter_rank h 0 |> List.length) = 3 then filter_rank h 0 
 				else three_kind t
+
+	(* run pair then pair again  *)
+	let two_pair (hand: hand) = 
+		let h = List.rev (sort_cards hand) in
+		if not (pair h = []) then 
+			pair h @ pair (List.(h |> filter (fun x -> fst x != fst(List.hd h))))
+		else 
+			[]
 
 	(* [pair hand] *)
 	let rec pair (hand: hand) = 

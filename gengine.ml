@@ -266,7 +266,7 @@ module Game_Engine = struct
 
 	(* [three_kind hand] *)
 	let rec three_kind (hand: hand) = 
-		let h = List.rev sort_cards hand in
+		let h = List.rev (sort_cards hand) in
 		if (List.length h < 3) then 
 			[]
 		else 

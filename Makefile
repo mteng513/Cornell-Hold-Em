@@ -1,5 +1,5 @@
 main: 
-	ocamlbuild -pkgs oUnit main.byte
+	ocamlfind ocamlc -package oUnit -package lablgtk2 -linkpkg gengine.mli player.mli opponent.mli GUpoker.mli gengine.ml player.ml opponent.ml GUpoker.ml test.ml main.ml -o start
 
 test:
-	ocamlbuild -pkgs oUnit test.byte && ./test.byte
+	ocamlfind ocamlc -package oUnit -package lablgtk2 -linkpkg gengine.mli player.mli opponent.mli GUpoker.mli gengine.ml player.ml opponent.ml GUpoker.ml test.ml -o test && ./test

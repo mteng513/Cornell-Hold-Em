@@ -7,9 +7,6 @@ module GU_Poker : sig
 	(* Draws main window for the game *)
 	val draw_start : unit -> unit 
 
-	(* Draws the start button *)
-	val draw_start_button : unit -> unit
-
 	(* Draw difficulty box *)
 	val draw_difficulty : unit -> unit 
 

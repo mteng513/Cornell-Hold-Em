@@ -262,15 +262,7 @@ module Game_Engine = struct
 				if (filter_rank h 0 |> List.length) = 4 then filter_rank h 0 
 				else four_kind t
 
-	(* full_house [hand] *)
-	let full_house (hand: hand) = 
-		let h = List.rev (sort_cards hand) in 
-		if not (three_kind h = []) then 
-			three_kind h @ pair (List.(h |> filter (fun x -> fst x != fst(List.hd h))))
-		else 
-			[]
-			
-	(* [three_kind hand] *)
+		(* [three_kind hand] *)
 	let rec three_kind (hand: hand) = 
 		let h = List.rev (sort_cards hand) in
 		if (List.length h < 3) then 
@@ -281,14 +273,6 @@ module Game_Engine = struct
 			|_::t-> 
 				if (filter_rank h 0 |> List.length) = 3 then filter_rank h 0 
 				else three_kind t
-
-	(* run pair then pair again  *)
-	let two_pair (hand: hand) = 
-		let h = List.rev (sort_cards hand) in
-		if not (pair h = []) then 
-			pair h @ pair (List.(h |> filter (fun x -> fst x != fst(List.hd h))))
-		else 
-			[]
 
 	(* [pair hand] *)
 	let rec pair (hand: hand) = 
@@ -301,6 +285,24 @@ module Game_Engine = struct
 			|h'::t-> 
 				if (filter_rank h 0 |> List.length) = 2 then filter_rank h 0 
 				else pair t
+
+	(* run pair then pair again  *)
+	let two_pair (hand: hand) = 
+		let h = List.rev (sort_cards hand) in
+		if not (pair h = []) then 
+			pair h @ pair (List.(h |> filter (fun x -> fst x != fst(List.hd h))))
+		else 
+			[]
+
+	(* full_house [hand] *)
+	let full_house (hand: hand) = 
+		let h = List.rev (sort_cards hand) in 
+		if not (three_kind h = []) then 
+			three_kind h @ pair (List.(h |> filter (fun x -> fst x != fst(List.hd h))))
+		else 
+			[]
+
+
 
     (* [score g_state] takes in the global_state [g_state] (POTENTIALLY NEEDS MORE INPUTS)
      * and updates the winning players scores with the points they won from the

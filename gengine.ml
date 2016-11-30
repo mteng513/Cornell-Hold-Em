@@ -250,7 +250,7 @@ module Game_Engine = struct
 	let filter_rank hand i = 
 	List.(hand |> filter (fun x -> fst x = fst(List.nth hand i)))
 
-	(* 4 of a kind, 3 of a kind, pair *)
+	(* [four_kind hand] *)
 	let four_kind (hand : hand) = 
 		let h = sort_cards hand in 
 		let w = filter_rank h 0 |> List.length in 
@@ -264,6 +264,17 @@ module Game_Engine = struct
 		|_,_,_,4 -> filter_rank h 3
 		|_ -> []
 
+	(* [three_kind hand] *)
+	let rec three_kind (hand: hand) = 
+		let h = List.rev sort_cards hand in
+		if (List.length h < 3) then 
+			[]
+		else 
+			match h with 
+			|[]-> []
+			|_::t-> 
+				if (filter_rank h 0 |> List.length) = 3 then filter_rank h 0 
+				else three_kind t
 
     (* [score g_state] takes in the global_state [g_state] (POTENTIALLY NEEDS MORE INPUTS)
      * and updates the winning players scores with the points they won from the

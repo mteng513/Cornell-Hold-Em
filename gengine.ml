@@ -171,7 +171,7 @@ module Game_Engine = struct
 	 * containing the flush if there is one (may exceed 5 cards if 6 or all cards have same suit).
 	 * Otherwise, returns the empty list.
 	 *)
-	let flush (hand: hand) : hand = 
+	let flush_hand (hand: hand) : hand = 
 		let h = sort_cards hand in 
 		if ((filter_suit h 0) |> List.length) >= 5 then 
 			filter_suit h 0
@@ -181,6 +181,12 @@ module Game_Engine = struct
 			filter_suit h 2
 		else 
 			[]
+
+	let flush (hand: hand) : int =
+		match flush_hand hand with
+		| a, b, c, d, e -> e * 1000000000000 + d * 10000000000 + c * 100000000 + b * 1000000 + a * 10000
+		| _ -> 0
+
 
 	(* BEGIN STRAIGHT CALC *)
 	(* [make_enum_rank rank] takes in [rank] of type rank and returns the int
@@ -220,7 +226,7 @@ module Game_Engine = struct
 		| 1 when len < 5 -> 
 					straight_hand hand pat ((List.nth hand (6 - len)) :: acc)
 		| 2 when len < 5 -> 
-					straight_hand hand pat ((List.nth hand (5 - len)) :: acc)
+					straight_hand hand pat ((List.nth hand (6 - len)) :: acc)
 		| 3 when len < 5 -> 
 					straight_hand hand pat ((List.nth hand (4 - len)) :: acc)
 		| 4 -> (List.nth hand 0)::(List.nth hand 1)::(List.nth hand 2)
@@ -234,17 +240,60 @@ module Game_Engine = struct
 	let are_consec (a:int) (b:int) (c:int) (d:int) (e:int) : bool =
 		if (a+1=b) && (b+1=c) && (c+1=d) && (d+1=e) then true else false  
 	
+	let remove_dup_rank e l =
+  		let rec removing l acc = match l with
+    		| [] -> List.rev acc
+	    	| h::t when fst e = fst h -> removing t acc
+	    	| h::t -> removing t (h::acc)
+	  	in removing l []
+	
+	let remove_dups_ranks l =
+	    let rec removing l acc = match l with
+	        | [] -> List.rev acc
+	        | h::t -> removing (remove_dup_rank h t) (h::acc)
+	    in removing l []
+	
+	let remove_elt e l =
+    	let rec go l acc = match l with
+	    	| [] -> List.rev acc
+	    	| x::xs when e = x -> go xs acc
+	    	| x::xs -> go xs (x::acc)
+    	in go l []
+
+	let remove_duplicates l =
+	    let rec go l acc = match l with
+		    | [] -> List.rev acc
+		    | x :: xs -> go (remove_elt x xs) (x::acc)
+	    in go l []
+
+	let rec remove_nonconsec l e acc =
+		match l with
+		| [] -> acc
+		| h::[] -> acc @ [h]
+		| h1::h2::t -> if h1 = h2 - 1 || e = h1 -1 then remove_nonconsec (h2::t) h1 (acc @ [h1])
+								else remove_nonconsec (h2::t) h1 acc
+
 	(* [straight hand] takes in a [hand] of type hand and returns the 
 	 * hand of the 5 cards making up the straight, sorted lowest to 
 	 * highest *)
-	let straight (hand: hand) : hand = 
-		let card_values = make_enum_hand hand [] in 
-		match card_values with
-		| _ :: _ ::a::b::c::d::e::[] when are_consec a b c d e -> straight_hand hand 1 []
-		| _ ::a::b::c::d::e:: _ ::[] when are_consec a b c d e -> straight_hand hand 2 []
-		| a::b::c::d::e::_::_::[] when are_consec a b c d e -> straight_hand hand 3 []
-		| 2::3::4::5::_::_::14::[] -> straight_hand hand 4 []
-		| _ -> [] 		
+	let straight (hand: hand) : int = 
+		let len = List.length hand - 1
+		let contains_ace = make_enum_rank (List.nth hand len) = 14 in
+		let card_values = remove_duplicates (make_enum_hand hand []) in
+		let consec_values = remove_nonconsec card_values in
+		match consec_values with
+		| _::_::10::11::12::13::14::[] 
+					when flush hand > 0 -> 100000000000000000000 (* straight_hand hand 0 [] *)
+		| _::10::11::12::13::14::[] 
+					when flush hand > 0 -> 100000000000000000000 (* straight_hand hand 0 [] *)
+		| 10::11::12::13::14::[] when flush hand > 0 -> 100000000000000000000 (* straight_hand hand 0 [] *)
+		| _::_::a::b::c::d::e::[] when are_consec a b c d e -> 10000000000 * e (* straight_hand hand 1 [] *)
+		| _::a::b::c::d::e::[] when are_consec a b c d e -> 10000000000 * e (* straight_hand hand 1 [] *)
+		| a::b::c::d::e::[] when are_consec a b c d e -> 10000000000 * e (* straight_hand hand 1 [] *)
+		| 2::3::4::5::_::_::_::[] when contains_ace -> 50000000000 (* when List.nth hand len -> straight_hand hand 4 [] *)
+		| 2::3::4::5::_::_::[] when contains_ace -> 50000000000(* when List.nth hand len -> straight_hand hand 4 [] *)
+		| 2::3::4::5::[] when contains_ace -> 50000000000 (* when List.nth hand len -> straight_hand hand 4 [] *)
+		| _ -> []
 
 	(* BEGIN 4Kind 3Kind PAIR CALC *)
 	let filter_rank hand i = 
@@ -261,6 +310,8 @@ module Game_Engine = struct
 			|h'::t-> 
 				if (filter_rank h 0 |> List.length) = 4 then filter_rank h 0 
 				else four_kind t
+
+
 
 		(* [three_kind hand] *)
 	let rec three_kind (hand: hand) = 

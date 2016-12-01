@@ -184,7 +184,7 @@ module Game_Engine = struct
 
 	let flush (hand: hand) : int =
 		match flush_hand hand with
-		| a, b, c, d, e -> e * 1000000000000 + d * 10000000000 + c * 100000000 + b * 1000000 + a * 10000
+		| a::b::c::d::e::[] -> e * 1000000000000 + d * 10000000000 + c * 100000000 + b * 1000000 + a * 10000
 		| _ -> 0
 
 
@@ -277,7 +277,7 @@ module Game_Engine = struct
 	 * hand of the 5 cards making up the straight, sorted lowest to 
 	 * highest *)
 	let straight (hand: hand) : int = 
-		let len = List.length hand - 1
+		let len = List.length hand - 1 in 
 		let contains_ace = make_enum_rank (List.nth hand len) = 14 in
 		let card_values = remove_duplicates (make_enum_hand hand []) in
 		let consec_values = remove_nonconsec card_values in

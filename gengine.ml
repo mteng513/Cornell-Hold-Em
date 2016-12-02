@@ -166,27 +166,6 @@ module Game_Engine = struct
 	let filter_suit (hand: hand) (i: int) : hand = 
 	List.(hand |> filter (fun x -> snd x = snd(List.nth hand i)))
 
-	(* [flush hand] takes in a hand [hand],
-	 * Returns the sorted card list, in ascending order of rank,
-	 * containing the flush if there is one (may exceed 5 cards if 6 or all cards have same suit).
-	 * Otherwise, returns the empty list.
-	 *)
-	let flush_hand (hand: hand) : hand = 
-		let h = sort_cards hand in 
-		if ((filter_suit h 0) |> List.length) >= 5 then 
-			filter_suit h 0
-		else if ((filter_suit h 1) |> List.length) >= 5 then 
-			filter_suit h 1
-		else if ((filter_suit h 2) |> List.length) >= 5 then 
-			filter_suit h 2
-		else 
-			[]
-
-	let flush (hand: hand) : int =
-		match flush_hand hand with
-		| a::b::c::d::e::[] -> e * 1000000000000 + d * 10000000000 + c * 100000000 + b * 1000000 + a * 10000
-		| _ -> 0
-
 
 	(* BEGIN STRAIGHT CALC *)
 	(* [make_enum_rank rank] takes in [rank] of type rank and returns the int
@@ -215,20 +194,76 @@ module Game_Engine = struct
 		|[] -> List.sort Pervasives.compare acc
 		|(rank, suit)::t -> make_enum_hand t (make_enum_rank rank::acc)
 
+	(* Computes the max of 4 numbers. *)
+  	let four_max a b c d = 
+	  	let max = ref a in 
+	    if (b > !max) then 
+	        max := b else  
+	    if (c > !max) then 
+	        max := c else 
+	    if (d > !max) then 
+	        max := d
+	    else (failwith "Failure: four_max");
+	 		!max
+
+
+ 	(* Returns true if there is a flush or there is a high possibility 
+ 	 * of a flush. *)
+	let flush_bool lst = 
+	  	let c1 = ref 0 in let c2 = ref 0 in let c3 = ref 0 in let c4 = ref 0 in 
+	  	(for i = 0 to (List.length lst) do 
+	  		match (snd (List.nth lst i)) with 
+	  		| Clarkson -> c1 := !c1 + 1
+	  		| Gries -> c2 := !c2 + 1
+	  		| Dijkstra -> c3 := !c3 + 1
+	  		| George -> c4 := !c4 + 1
+	  	done);
+	  	let best_suit = four_max !c1 !c2 !c3 !c4 in 
+	  	match best_suit with
+	  	| (5) -> true
+	  	| (4) -> true
+	  	| _ -> false
+
+
+	(* [flush hand] takes in a hand [hand],
+	 * Returns the sorted card list, in ascending order of rank,
+	 * containing the flush if there is one (may exceed 5 cards if 6 or all cards have same suit).
+	 * Otherwise, returns the empty list.
+	 *)
+	let flush_hand (hand: hand) : hand = 
+		let h = sort_cards hand in 
+		if ((filter_suit h 0) |> List.length) >= 7 then 
+			filter_suit h 0
+		else if ((filter_suit h 1) |> List.length) >= 7 then 
+			filter_suit h 1
+		else if ((filter_suit h 2) |> List.length) >= 7 then 
+			filter_suit h 2
+		else 
+			[]
+
+	let flush (hand: hand) : int =
+		let card_values = make_enum_hand (flush_hand hand) [] in
+		match card_values with 
+		| _::_::a::b::c::d::e::[] -> e * 1000000000000 + d * 10000000000 + c * 100000000 + b * 1000000 + a * 10000
+		| _::a::b::c::d::e::[] -> e * 1000000000000 + d * 10000000000 + c * 100000000 + b * 1000000 + a * 10000
+		| a::b::c::d::e::[] -> e * 1000000000000 + d * 10000000000 + c * 100000000 + b * 1000000 + a * 10000
+		| _ -> 0
+
+
 	(* [straight_hand hand pat acc] returns the sorted straight hand, takes in: 
 	 * [hand] of type hand which is a 7 card hand including the dealt cards and 
 	 * the cards in play, [pat] of type int that indicates which pattern of a
 	 * straight the hand is, and an accumulator [acc] of type hand that 
 	 * recursively accumulates the cards in order from least to greatest *)
-	let rec straight_hand (hand: hand) (pat: int) (acc: hand): hand =
+	let rec royal_flush_hand (hand: hand) (pat: int) (acc: hand): hand =
 		let len = List.length acc in
 		match pat with
 		| 1 when len < 5 -> 
-					straight_hand hand pat ((List.nth hand (6 - len)) :: acc)
+					royal_flush_hand hand pat ((List.nth hand (6 - len)) :: acc)
 		| 2 when len < 5 -> 
-					straight_hand hand pat ((List.nth hand (6 - len)) :: acc)
+					royal_flush_hand hand pat ((List.nth hand (6 - len)) :: acc)
 		| 3 when len < 5 -> 
-					straight_hand hand pat ((List.nth hand (4 - len)) :: acc)
+					royal_flush_hand hand pat ((List.nth hand (4 - len)) :: acc)
 		| 4 -> (List.nth hand 0)::(List.nth hand 1)::(List.nth hand 2)
 				::(List.nth hand 3)::(List.nth hand 6)::[]
 		| _ -> acc
@@ -278,22 +313,26 @@ module Game_Engine = struct
 	 * highest *)
 	let straight (hand: hand) : int = 
 		let len = List.length hand - 1 in 
-		let contains_ace = make_enum_rank (List.nth hand len) = 14 in
+		let contains_ace = make_enum_rank (fst (List.nth hand len)) = 14 in
 		let card_values = remove_duplicates (make_enum_hand hand []) in
-		let consec_values = remove_nonconsec card_values in
+		let consec_values = remove_nonconsec card_values 0 [] in
+		let straight_cards = royal_flush_hand hand in
 		match consec_values with
 		| _::_::10::11::12::13::14::[] 
-					when flush hand > 0 -> 100000000000000000000 (* straight_hand hand 0 [] *)
+					when flush hand > 0 -> 1000000000 (* 100000000000000000000 *) (* straight_hand hand 0 [] *)
 		| _::10::11::12::13::14::[] 
-					when flush hand > 0 -> 100000000000000000000 (* straight_hand hand 0 [] *)
-		| 10::11::12::13::14::[] when flush hand > 0 -> 100000000000000000000 (* straight_hand hand 0 [] *)
-		| _::_::a::b::c::d::e::[] when are_consec a b c d e -> 10000000000 * e (* straight_hand hand 1 [] *)
-		| _::a::b::c::d::e::[] when are_consec a b c d e -> 10000000000 * e (* straight_hand hand 1 [] *)
-		| a::b::c::d::e::[] when are_consec a b c d e -> 10000000000 * e (* straight_hand hand 1 [] *)
-		| 2::3::4::5::_::_::_::[] when contains_ace -> 50000000000 (* when List.nth hand len -> straight_hand hand 4 [] *)
-		| 2::3::4::5::_::_::[] when contains_ace -> 50000000000(* when List.nth hand len -> straight_hand hand 4 [] *)
-		| 2::3::4::5::[] when contains_ace -> 50000000000 (* when List.nth hand len -> straight_hand hand 4 [] *)
-		| _ -> []
+					when flush hand > 0 -> 1000000000(* 100000000000000000000 *) (* straight_hand hand 0 [] *)
+		| 10::11::12::13::14::[] when flush hand > 0 -> 1000000000 (* 100000000000000000000 *) (* straight_hand hand 0 [] *)
+		| _::_::a::b::c::d::e::[] when are_consec a b c d e -> 
+								if flush hand > 0 then 20000000 + e else 15000000 + e (* straight_hand hand 1 [] *)
+		| _::a::b::c::d::e::[] when are_consec a b c d e -> 
+								if flush hand > 0 then 20000000 + e else 15000000 + e  (* straight_hand hand 1 [] *)
+		| a::b::c::d::e::[] when are_consec a b c d e -> 
+								if flush hand > 0 then 20000000 + e else 15000000 + e  (* straight_hand hand 1 [] *)
+		| 2::3::4::5::_::_::_::[] when contains_ace -> if flush hand > 0 then 20000005 else 15000005  (* when List.nth hand len -> straight_hand hand 4 [] *)
+		| 2::3::4::5::_::_::[] when contains_ace -> if flush hand > 0 then 20000005 else 15000005 (* when List.nth hand len -> straight_hand hand 4 [] *)
+		| 2::3::4::5::[] when contains_ace -> if flush hand > 0 then 20000005 else 15000005 (* when List.nth hand len -> straight_hand hand 4 [] *)
+		| _ -> 0
 
 	(* BEGIN 4Kind 3Kind PAIR CALC *)
 	let filter_rank hand i = 

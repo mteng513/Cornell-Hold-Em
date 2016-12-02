@@ -54,6 +54,8 @@ module Game_Engine : sig
 	 * final betting round *)
 	val river : global_state -> unit
 
+	val straight : card list -> int
+
 	(* Score function for the engine. Transitions to the score stage, where the 
 	 * score of all hands still in is computed and the winner is declared. If
 	 * someone won, the game ends. If someone does not win, we go back to the

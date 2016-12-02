@@ -152,21 +152,46 @@ module Opponent = struct
   			| Dijkstra -> c3 := !c3 + 1
   			| George -> c4 := !c4 + 1
   		done);
-  	let best_suit = four_max !c1 !c2 !c3 !c4 in 
-  	match best_suit with
-  		| (5) -> true
-  		| (4) -> true
-  		| _ -> false
-
+  	four_max !c1 !c2 !c3 !c4  
+ 
   (* General helper for bets after the first. *)
   let bet_helper cardlst = 
-  	if (flush cardlst) then ignore (bet (Random.int 750))
-  	else check ()
+  	if ((straight cardlst) > 0) then ignore (bet (Random.int 750))
+  	else if ((flush cardlst) > 4) then ignore (bet (Random.int 500));
+
+  	check ()
 
   (* Sorts cards by RANK. *)
   let sort_cards (h:hand) : hand = 
 		List.sort Pervasives.compare h
 
+
+	(* Returns maximum bet applicable given the cards in the hand. *)
+	let max_bet cardlst = 
+		if ((straight cardlst) > 0) then 750
+  	else if ((flush cardlst) > 4) then 500
+  	else 50 
+
+	let twofifty_bet () = failwith "TODO"
+
+	let sixhun_bet () = failwith "TODO"
+
+	let thous_bet () = failwith "TODO"
+
+	let bluff_bet () = failwith "TODO"
+
+  (* Secondary decision function for the second round of betting. *)
+  let decide_two () = 
+  	let st = get_state () in 
+  	let player_index = !st.c_player in 
+  	let hands = !st.hands in
+  	let current_bet = !st.current_bet in 
+
+  	if current_bet < 100 then call () 
+  	else if current_bet < 250 then twofifty_bet () 
+  	else if current_bet < 600 then sixhun_bet () 
+  	else if current_bet < 1000 then thous_bet () 
+  	else  bluff_bet ()
 
 	(* Main decision function for the opponent. *)
   let decide () = 

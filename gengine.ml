@@ -438,8 +438,13 @@ module Game_Engine = struct
 		| _ -> 0
 
 	let high_card (hand: card list) : int =
-		let sorted_cards = sort_cards hand in
-		List.nth sorted_cards (List.length hand - 1)
+		let card_values = make_enum_hand (sort_cards hand) [] in
+		match card_values with
+		| _::_::a::b::c::d::e::[] -> 100*e + 50*d + 20*c + 10*b + a
+		| _::a::b::c::d::e::[] -> 100*e + 50*d + 20*c + 10*b + a
+		| a::b::c::d::e::[] -> 100*e + 50*d + 20*c + 10*b + a
+		| a::b::[] -> 10*b + a
+		| _ -> 0
 
     (* [score g_state] takes in the global_state [g_state] (POTENTIALLY NEEDS MORE INPUTS)
      * and updates the winning players scores with the points they won from the

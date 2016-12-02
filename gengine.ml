@@ -439,7 +439,9 @@ module Game_Engine = struct
 
 	let high_card (hand: card list) : int =
 		let sorted_cards = sort_cards hand in
-		List.nth sorted_cards (List.length hand - 1)
+		match (List.nth sorted_cards (List.length hand - 1)) with
+			| (rank, suit) -> make_enum_rank rank
+			| _ -> failwith "Bad card list"
 
     (* [score g_state] takes in the global_state [g_state] (POTENTIALLY NEEDS MORE INPUTS)
      * and updates the winning players scores with the points they won from the

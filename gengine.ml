@@ -437,6 +437,9 @@ module Game_Engine = struct
 		| p1::p2::t1::t2::t3::[] when t1 = t2 && t2 = t3 && p1 = p2 -> 18000000 + 1000 * t1 + p1
 		| _ -> 0
 
+	let high_card (hand: card list) : int =
+		let sorted_cards = sort_cards hand in
+		List.nth sorted_cards (List.length hand - 1)
 
     (* [score g_state] takes in the global_state [g_state] (POTENTIALLY NEEDS MORE INPUTS)
      * and updates the winning players scores with the points they won from the

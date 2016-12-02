@@ -194,6 +194,19 @@ module Game_Engine = struct
 		|[] -> List.sort Pervasives.compare acc
 		|(rank, suit)::t -> make_enum_hand t (make_enum_rank rank::acc)
 
+	let remove_elt e l =
+    	let rec go l acc = match l with
+	    	| [] -> List.rev acc
+	    	| x::xs when e = x -> go xs acc
+	    	| x::xs -> go xs (x::acc)
+    	in go l []
+
+	let remove_duplicates l =
+	    let rec go l acc = match l with
+		    | [] -> List.rev acc
+		    | x :: xs -> go (remove_elt x xs) (x::acc)
+	    in go l []
+
 	(* Computes the max of 4 numbers. *)
   	let four_max a b c d = 
 	  	let max = ref a in 
@@ -211,7 +224,7 @@ module Game_Engine = struct
  	 * of a flush. *)
 	let flush_bool lst = 
 	  	let c1 = ref 0 in let c2 = ref 0 in let c3 = ref 0 in let c4 = ref 0 in 
-	  	(for i = 0 to (List.length lst) do 
+	  	(for i = 0 to (List.length lst - 1) do 
 	  		match (snd (List.nth lst i)) with 
 	  		| Clarkson -> c1 := !c1 + 1
 	  		| Gries -> c2 := !c2 + 1
@@ -219,10 +232,8 @@ module Game_Engine = struct
 	  		| George -> c4 := !c4 + 1
 	  	done);
 	  	let best_suit = four_max !c1 !c2 !c3 !c4 in 
-	  	match best_suit with
-	  	| (5) -> true
-	  	| (4) -> true
-	  	| _ -> false
+	  	best_suit = 5
+	  	
 
 
 	(* [flush hand] takes in a hand [hand],
@@ -230,19 +241,19 @@ module Game_Engine = struct
 	 * containing the flush if there is one (may exceed 5 cards if 6 or all cards have same suit).
 	 * Otherwise, returns the empty list.
 	 *)
-	let flush_hand (hand: hand) : hand = 
+	let flush_hand (hand: card list) : card list = 
 		let h = sort_cards hand in 
-		if ((filter_suit h 0) |> List.length) >= 7 then 
+		if ((filter_suit h 0) |> List.length) >= 5 then 
 			filter_suit h 0
-		else if ((filter_suit h 1) |> List.length) >= 7 then 
+		else if ((filter_suit h 1) |> List.length) >= 5 then 
 			filter_suit h 1
-		else if ((filter_suit h 2) |> List.length) >= 7 then 
+		else if ((filter_suit h 2) |> List.length) >= 5 then 
 			filter_suit h 2
 		else 
 			[]
 
-	let flush (hand: hand) : int =
-		let card_values = make_enum_hand (flush_hand hand) [] in
+	let flush (hand: card list) : int =
+		let card_values = remove_duplicates (make_enum_hand (flush_hand hand) []) in
 		match card_values with 
 		| _::_::a::b::c::d::e::[] -> 16000000 + e*10000 + d*1000 + c*100 + b*10 + a
 		| _::a::b::c::d::e::[] -> 16000000 + e*10000 + d*1000 + c*100 + b*10 + a
@@ -288,20 +299,8 @@ module Game_Engine = struct
 	        | h::t -> removing (remove_dup_rank h t) (h::acc)
 	    in removing l []
 	
-	let remove_elt e l =
-    	let rec go l acc = match l with
-	    	| [] -> List.rev acc
-	    	| x::xs when e = x -> go xs acc
-	    	| x::xs -> go xs (x::acc)
-    	in go l []
 
-	let remove_duplicates l =
-	    let rec go l acc = match l with
-		    | [] -> List.rev acc
-		    | x :: xs -> go (remove_elt x xs) (x::acc)
-	    in go l []
-
-	let rec remove_nonconsec l e acc =
+	let rec remove_nonconsec (l: int list) (e: int) (acc: int list): int list =
 		match l with
 		| [] -> acc
 		| h::[] -> acc @ [h]
@@ -316,7 +315,7 @@ module Game_Engine = struct
 		let contains_ace = make_enum_rank (fst (List.nth hand len)) = 14 in
 		let card_values = remove_duplicates (make_enum_hand hand []) in
 		let consec_values = remove_nonconsec card_values 0 [] in
-		let straight_cards = royal_flush_hand hand in
+		(* let straight_cards = royal_flush_hand hand in *)
 		match consec_values with
 		| _::_::10::11::12::13::14::[] 
 					when flush hand > 0 -> 1000000000 (* 100000000000000000000 *) (* straight_hand hand 0 [] *)
@@ -324,10 +323,16 @@ module Game_Engine = struct
 					when flush hand > 0 -> 1000000000(* 100000000000000000000 *) (* straight_hand hand 0 [] *)
 		| 10::11::12::13::14::[] when flush hand > 0 -> 1000000000 (* 100000000000000000000 *) (* straight_hand hand 0 [] *)
 		| _::_::a::b::c::d::e::[] when are_consec a b c d e -> 
-								if flush hand > 0 then 20000000 + e else 15000000 + e (* straight_hand hand 1 [] *)
+								if flush hand > 0 then 20000000 + e else 15000000 + e
 		| _::a::b::c::d::e::[] when are_consec a b c d e -> 
-								if flush hand > 0 then 20000000 + e else 15000000 + e  (* straight_hand hand 1 [] *)
+								if flush hand > 0 then 20000000 + e else 15000000 + e
 		| a::b::c::d::e::[] when are_consec a b c d e -> 
+								if flush hand > 0 then 20000000 + e else 15000000 + e
+		| a::b::c::d::e::[] when are_consec a b c d e -> 
+								if flush hand > 0 then 20000000 + e else 15000000 + e
+		| a::b::c::d::e::_::[] when are_consec a b c d e -> 
+								if flush hand > 0 then 20000000 + e else 15000000 + e						
+		| a::b::c::d::e::_::_::[] when are_consec a b c d e -> 
 								if flush hand > 0 then 20000000 + e else 15000000 + e  (* straight_hand hand 1 [] *)
 		| 2::3::4::5::_::_::_::[] when contains_ace -> if flush hand > 0 then 20000005 else 15000005  (* when List.nth hand len -> straight_hand hand 4 [] *)
 		| 2::3::4::5::_::_::[] when contains_ace -> if flush hand > 0 then 20000005 else 15000005 (* when List.nth hand len -> straight_hand hand 4 [] *)
@@ -335,11 +340,11 @@ module Game_Engine = struct
 		| _ -> 0
 
 	(* BEGIN 4Kind 3Kind PAIR CALC *)
-	let filter_rank hand i = 
+	let filter_rank (hand: card list) (i: int): card list = 
 		List.(hand |> filter (fun x -> fst x = fst(List.nth hand i)))
 
 	(* [four_kind hand] *)
-	let rec four_kind (hand: hand) = 
+	let rec four_kind_hand (hand: card list): card list = 
 		let h = List.rev (sort_cards hand) in
 		if (List.length h < 4) then 
 			[]
@@ -348,12 +353,19 @@ module Game_Engine = struct
 			|[]-> []
 			|h'::t-> 
 				if (filter_rank h 0 |> List.length) = 4 then filter_rank h 0 
-				else four_kind t
+				else four_kind_hand t
+
+	let four_kind (hand: card list) : int =
+		let card_values = List.rev (make_enum_hand (four_kind_hand hand) []) in
+		match card_values with 
+		| h::f1::f2::f3::f4::[] when f2 = f1 && f3 = f2 && f4 = f3 -> 19000000 + f1 * 1000 + h
+		| f1::f2::f3::f4::h::[] when f2 = f1 && f3 = f2 && f4 = f3 -> 19000000 + f1 * 1000 + h
+		| _ -> 0
 
 
 
 		(* [three_kind hand] *)
-	let rec three_kind (hand: hand) = 
+	let rec three_kind_hand (hand: card list): card list = 
 		let h = List.rev (sort_cards hand) in
 		if (List.length h < 3) then 
 			[]
@@ -362,36 +374,68 @@ module Game_Engine = struct
 			|[]-> []
 			|_::t-> 
 				if (filter_rank h 0 |> List.length) = 3 then filter_rank h 0 
-				else three_kind t
+				else three_kind_hand t
+
+	let three_kind (hand: card list) : int =
+		let card_values = List.rev (make_enum_hand (three_kind_hand hand) []) in
+		match card_values with 
+		| h1::h2::t1::t2::t3::[] when t2 = t1 && t3 = t2 -> 1000000 * t1 + 100 * h2 + h1
+		| h1::t1::t2::t3::h2::[] when t2 = t1 && t3 = t2 -> 1000000 * t1 + 100 * h2 + h1
+		| t1::t2::t3::h1::h2::[] when t2 = t1 && t3 = t2 -> 1000000 * t1 + 100 * h2 + h1
+		| _ -> 0
 
 	(* [pair hand] *)
-	let rec pair (hand: hand) = 
+	let rec pair_hand (hand: card list) : card list = 
 		let h = List.rev (sort_cards hand) in
 		if (List.length h < 2) then 
 			[]
 		else 
 			match h with 
-			|[]-> []
-			|h'::t-> 
-				if (filter_rank h 0 |> List.length) = 2 then filter_rank h 0 
-				else pair t
+			| []-> []
+			| h'::t-> 
+				if (filter_rank h 0 |> List.length) = 2 then (filter_rank h 0)
+				else pair_hand t
+
+	let pair (hand: card list) : int =
+		let card_values = List.rev (make_enum_hand (pair_hand hand) []) in 
+		match card_values with
+		| h1::h2::h3::p1::p2::[] when p1 = p2 -> 1000 * p1 + 100 * h3 + 10 * h2 + h1
+		| h1::h2::p1::p2::h3::[] when p1 = p2 -> 1000 * p1 + 100 * h3 + 10 * h2 + h1
+		| h1::p1::p2::h2::h3::[] when p1 = p2 -> 1000 * p1 + 100 * h3 + 10 * h2 + h1
+		| p1::p2::h1::h2::h3::[] when p1 = p2 -> 1000 * p1 + 100 * h3 + 10 * h2 + h1
+		| _ -> 0
+
 
 	(* run pair then pair again  *)
-	let two_pair (hand: hand) = 
+	let two_pair_hand (hand: card list) : card list = 
 		let h = List.rev (sort_cards hand) in
-		if not (pair h = []) then 
-			pair h @ pair (List.(h |> filter (fun x -> fst x != fst(List.hd h))))
+		if not (pair_hand h = []) then 
+			pair_hand h @ pair_hand (List.(h |> filter (fun x -> fst x != fst(List.hd h))))
 		else 
 			[]
+
+	let two_pair (hand: card list) : int = 
+		let card_values = List.rev (make_enum_hand (three_kind_hand hand) []) in
+		match card_values with
+		| h::fp1::fp2::sp1::sp2::[] when fp1 = fp2 && sp1 = sp2 -> 100000 * sp1 + 100 * fp1 + h
+		| fp1::fp2::h::sp1::sp2::[] when fp1 = fp2 && sp1 = sp2 -> 100000 * sp1 + 100 * fp1 + h
+		| fp1::fp2::sp1::sp2::h::[] when fp1 = fp2 && sp1 = sp2 -> 100000 * sp1 + 100 * fp1 + h
+		| _ -> 0
 
 	(* full_house [hand] *)
-	let full_house (hand: hand) = 
+	let full_house_hand (hand: card list) : card list = 
 		let h = List.rev (sort_cards hand) in 
-		if not (three_kind h = []) then 
-			three_kind h @ pair (List.(h |> filter (fun x -> fst x != fst(List.hd h))))
+		if not (three_kind_hand h = []) then 
+			three_kind_hand h @ pair_hand (List.(h |> filter (fun x -> fst x != fst(List.hd h))))
 		else 
 			[]
 
+	let full_house (hand: card list) : int =
+		let card_values = List.rev (make_enum_hand (three_kind_hand hand) []) in
+		match card_values with
+		| t1::t2::t3::p1::p2::[] when t1 = t2 && t2 = t3 && p1 = p2 -> 18000000 + 1000 * t1 + p1
+		| p1::p2::t1::t2::t3::[] when t1 = t2 && t2 = t3 && p1 = p2 -> 18000000 + 1000 * t1 + p1
+		| _ -> 0
 
 
     (* [score g_state] takes in the global_state [g_state] (POTENTIALLY NEEDS MORE INPUTS)

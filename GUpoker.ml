@@ -1,7 +1,6 @@
 open GMain
 open GdkKeysyms
 open GtkMisc
-open Game_Engine
 
 (* Ml file for the GUpoker *)
 module GU_Poker = struct
@@ -117,8 +116,8 @@ module GU_Poker = struct
   let locale = GtkMain.Main.init ()
 
   (* Draw difficulty box *)
-  let draw_difficulty () =
-    let difwindow = GWindow.window ~width:320 ~height:240
+  let draw_difficulty () = ()
+    (* let difwindow = GWindow.window ~width:320 ~height:240
                               ~title:"Choose Difficulty" () in
     let difvbox = GPack.vbox ~packing:difwindow#add () in
     difwindow#connect#destroy ~callback:Main.quit;
@@ -144,14 +143,14 @@ module GU_Poker = struct
     let diff3 = GButton.button ~label: "Hard"
           ~packing:vbox#add () in
     diff3#connect#clicked ~callback: (fun () -> draw_n_players ();
-    prerr_endline "Medium is the only difficult supported at this time");
+    prerr_endline "Medium is the only difficult supported at this time"); *)
 
 
   (* Draw number of players box that will allow the
    * user to enter the number of players *)
   let draw_n_players () =
-
-    let opp1 = GButton.button ~label:"vs 1 CPU"
+    ()
+    (* let opp1 = GButton.button ~label:"vs 1 CPU"
           ~packing:vbox#add () in
     opp1#connect#clicked ~callback: (fun () -> init_game 1);
     let opp2 = GButton.button ~label:"vs 2 CPUs"
@@ -171,35 +170,34 @@ module GU_Poker = struct
     opp6#connect#clicked ~callback: (fun () -> init_game 6);
     let opp7 = GButton.button ~label:"vs 7 CPUs"
           ~packing:vbox#add () in
-    opp7#connect#clicked ~callback: (fun () -> init_game 7);
+    opp7#connect#clicked ~callback: (fun () -> init_game 7);  *)
 
   (* Sends the number of players to the GUI, indicating
    * that the user has started the game *)
   let init_game i =
     failwith "Unimplemented"
-    (*start game function- need help*)
-    let game_state = {current_st = START; cards_in_play =  }
-    player_home ();
+    (* let game_state = {current_st = START; cards_in_play =  }
+    player_home (); *)
 
-  let player_home () =
-    let bet = GButton.button ~label:"BET"
+  let player_home () = failwith "Unimplemented"
+    (* let bet = GButton.button ~label:"BET"
           ~packing:vbox#add () in
-    bet#connect#clicked ~callback: (fun () -> (*input box and bet function*));
+    bet#connect#clicked ~callback: (fun () -> ()(*input box and bet function*));
     let fold = GButton.button ~label:"FOLD"
           ~packing:vbox#add () in
-    fold#connect#clicked ~callback: (fun () -> (*fold function*));
+    fold#connect#clicked ~callback: (fun () -> ()(*fold function*));
     let call = GButton.button ~label: "CALL"
           ~packing:vbox#add () in
-    call#connect#clicked ~callback: (fun () -> (*tf is call*));
+    call#connect#clicked ~callback: (fun () -> ()(*tf is call*));
     let check = GButton.button ~label:"CHECK"
           ~packing:vbox#add () in
     check#connect#clicked ~callback: (fun () -> draw_cards ());
     let get_state = GButton.button ~label:"GET STATE"
           ~packing:vbox#add () in
-    get_state#connect#clicked ~callback: (fun () -> (*state getter*));
+    get_state#connect#clicked ~callback: (fun () -> ()(*state getter*));
     let show_table = GButton.button ~label: "SHOW TABLE"
           ~packing:vbox#add () in
-    show_table#connect#clicked ~callback: (fun () -> (*show image of table*));
+    show_table#connect#clicked ~callback: (fun () -> ()(*show image of table*));  *)
 
   (* Draws players hand *)
   let draw_cards () =

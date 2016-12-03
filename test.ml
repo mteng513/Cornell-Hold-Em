@@ -88,7 +88,7 @@ module Test_Game_Engine = struct
 			[(Four, Gries); (Four, Clarkson); (Four, Gries); (Four, Clarkson);
 			(Ace, Dijkstra)]));
 
-		"Full House 4" >:: (fun _ -> assert_equal 0 (GEngine.full_house
+		"Full House 4" >:: (fun _ -> assert_equal 18004014 (GEngine.full_house
 			[(Four, Gries); (Four, Clarkson); (Four, Gries); (Ace, Clarkson);
 			(Ace, Dijkstra)]));
 

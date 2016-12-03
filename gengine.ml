@@ -440,8 +440,8 @@ module Game_Engine = struct
 	(* full_house [hand] *)
 	let full_house_hand (hand: card list) : card list = 
 		let h = List.rev (sort_cards hand) in 
-		if not (three_kind_hand h = []) then 
-			three_kind_hand h @ pair_hand (List.(h |> filter (fun x -> fst x != fst(List.hd h))))
+		if not (three_kind_hand h = []) then  
+			(three_kind_hand h) @ (pair_hand (List.(h |> filter (fun x -> fst x != fst(List.hd (three_kind_hand h))))))
 		else 
 			[]
 

@@ -553,26 +553,18 @@ module Game_Engine = struct
 				(while not (g_state.c_player = index_of_max g_state.bets) do 
 					signal_bet g_state; 
 					g_state.c_player <- g_state.c_player + 1; done);
-
 				g_state.c_player <- 0;
 				transition_state g_state;
 			| _ -> failwith "Bad state"
 
 	(* [deal g_state deck] takes in the current_st [g_state] and the current 
 	 * deck ref [deck] and updates the state with the hands. returns unit *)
-	let deal (g_state : global_state) (deck: deck ref) : unit = (* ()
-		let deal g_state deck =  *)
-		(* step 1: make sure deck has enough cards *)
-		(if List.length !deck < (g_state.n_players+5) 
-		then (reset_deck (); shuffle ())
-		else ());
-		(* step 2: deal cards to all players using pop *)
-		(for i = 1 to g_state.n_players do
+	let deal (g_state : global_state) (deck: deck ref) : unit =
+		(for i = 0 to (g_state.n_players - 1) do
 			g_state.hands <- 
-				(g_state.n_players - i, [pop deck; pop deck])::(g_state.hands);
-		done)(* ;
-		(*step 3: MAYBE?!?!?! change state to BET_ONE*) 
-		transition_state g_state *)
+				(i, [pop deck; pop deck])::(g_state.hands);
+		done);
+		transition_state g_state
 
 	(* [flop g_state] takes in the global_state [g_state] and updates it with
 	 * the flop stage of the game. it draws and plays the 3 cards revealed in 
@@ -639,6 +631,10 @@ module Game_Engine = struct
       players you'd like to play with.");
       let players = read_int () in
       !state.n_players <- players;
+      !state.bets <- Array.make players 0;
+
+      (* Shuffle deck. *)
+      reset_deck (); shuffle (); shuffle (); shuffle (); shuffle ();
 
       (while (!state.current_st <> END) do game_loop !state done); 
       raise GameEnded

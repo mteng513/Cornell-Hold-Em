@@ -59,6 +59,10 @@ module Game_Engine : sig
 
 	val straight : card list -> int
 
+    val high_card : hand -> int
+
+    val full_house : hand -> int
+
 	(* Score function for the engine. Transitions to the score stage, where the 
 	 * score of all hands still in is computed and the winner is declared. If
 	 * someone won, the game ends. If someone does not win, we go back to the

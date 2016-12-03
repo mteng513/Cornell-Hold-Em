@@ -200,7 +200,7 @@ module Opponent = struct
   	let hands = !st.hands in 
 
   	match (List.nth hands player_index) with 
-  		| (i, (c1::c2::[])) -> let hand = (c1::c2::[]) in 
+  		| ((c1::c2::[])) -> let hand = (c1::c2::[]) in 
 
   		(match !st.current_st with
   			| BET_ZERO -> bet_zero_helper (sort_cards hand)

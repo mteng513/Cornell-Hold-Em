@@ -23,9 +23,10 @@ module Game_Engine = struct
 		mutable current_bet : int;
 		mutable n_players : int;
 		mutable c_player : int;
-		mutable hands : (int * hand) list; 
+		mutable hands : hand list; 
 		mutable bets : int array;
 		mutable players_in : bool array;
+		mutable scores: int array;
 	}
 
 	exception GameEnded
@@ -36,7 +37,7 @@ module Game_Engine = struct
 	let deck = ref [] 
 	let state = ref {current_st = START; cards_in_play = []; pot = 0;
 		current_bet = 0; n_players = 0; c_player = 0; hands = []; 
-		bets = [||]; players_in = [||]}
+		bets = [||]; players_in = [||]; scores = [||]}
 
 	(* [suit_to_string suit] takes in a suit [suit] and returns its
 	 * string representation formatted for printing *)
@@ -562,7 +563,7 @@ module Game_Engine = struct
 	let deal (g_state : global_state) (deck: deck ref) : unit =
 		(for i = 0 to (g_state.n_players - 1) do
 			g_state.hands <- 
-				(i, [pop deck; pop deck])::(g_state.hands);
+				((g_state.hands)(* @[pop deck; pop deck] *));
 		done);
 		transition_state g_state
 

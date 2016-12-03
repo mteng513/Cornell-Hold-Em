@@ -26,9 +26,10 @@ module Game_Engine : sig
 		mutable current_bet : int;
 		mutable n_players : int;
 		mutable c_player : int;
-		mutable hands : (int * hand) list; 
+		mutable hands : hand list; 
 		mutable bets : int array;
 		mutable players_in : bool array;
+		mutable scores: int array;
 	}
 
 	(* Switch function - performs the transition from player to player

@@ -461,13 +461,52 @@ module Game_Engine = struct
 		| a::b::[] -> 10*b + a
 		| _ -> 0
 
+	(* [max_of_array bets] takes in an array [bets] and returns the greatest
+	 * array element value *)
+	let rec max_of_array (bets: 'a array) : 'a =
+		let len = Array.length bets in
+		match bets with
+		| [||] -> 0
+		| bets when len = 1 -> Array.get bets 0
+		| bets when len > 0 -> 
+			let x = Array.get bets 0 in
+			let y = max_of_array (Array.sub bets 1 (len - 1)) in
+			if x > y then x else y
+		| _ -> failwith "wtf is going on"
+
+	(* [index_in_array a e index_acc] takes in array [a], element [e], and the
+	 * index accumulator int [index_acc]. returns the index of element e in 
+	 * array a. The index_acc should start at 0/the desired starting point *)
+	let rec index_in_array (a: 'a array) (e: 'a) (index_acc: int) : int =
+		if a.(index_acc) = e 
+		then index_acc 
+		else index_in_array a e (index_acc + 1)
+
+	(* [index_of_max bets] gets the index of the max element in an int array. 
+	 * Takes in the int array [bets] and returns int index of the greatest 
+	 * element in the array *)
+	let rec index_of_max (bets: int array) : int =
+		let max_element = max_of_array bets in
+		index_in_array bets max_element 0 
+
+
+
     (* [score g_state] takes in the global_state [g_state] (POTENTIALLY NEEDS MORE INPUTS)
      * and updates the winning players scores with the points they won from the
  	 * pot. Returns a unit *)
 	let score (g_state : global_state) : unit = 
-		match g_state.players_in with
-		| [|a; b; c; d; e; f; g; h|] -> () 
-		| _ -> ()
+		let max_score = max_of_array g_state.bets in
+		let max_index = index_in_array g_state.bets max_score 0 in
+		let p_in_list = Array.to_list (g_state.players_in) in
+		for i = 0 to (List.length p_in_list) - 1 do
+			if (List.nth p_in_list i) 
+			then (* score their hand *) ()
+			else (* give them a zero *) ()
+		done
+
+		(* match p_in_list with
+		| a::b::c::d::e::f::g::h::[] -> () 
+		| _ -> () *)
 
 		
 
@@ -517,35 +556,7 @@ module Game_Engine = struct
 		| _ -> print_endline "invalid input received. try again"; 
 							signal_bet g_state
 
-	(* [index_in_array a e index_acc] takes in array [a], element [e], and the
-	 * index accumulator int [index_acc]. returns the index of element e in 
-	 * array a. The index_acc should start at 0/the desired starting point *)
-	let rec index_in_array (a: 'a array) (e: 'a) (index_acc: int) : int =
-		if a.(index_acc) = e 
-		then index_acc 
-		else index_in_array a e (index_acc + 1)
 	
-	(* [max_of_array bets] takes in an array [bets] and returns the greatest
-	 * array element value *)
-	let rec max_of_array (bets: 'a array) : 'a =
-		let len = Array.length bets in
-		match bets with
-		| [||] -> 0
-		| bets when len = 1 -> Array.get bets 0
-		| bets when len > 0 -> 
-			let x = Array.get bets 0 in
-			let y = max_of_array (Array.sub bets 1 (len - 1)) in
-			if x > y then x else y
-		| _ -> failwith "wtf is going on"
-
-
-	(* [index_of_max bets] gets the index of the max element in an int array. 
-	 * Takes in the int array [bets] and returns int index of the greatest 
-	 * element in the array *)
-	let rec index_of_max (bets: int array) : int =
-		let max_element = max_of_array bets in
-		index_in_array bets max_element 0 
-
 	(* [switch g_state] is called in after deal and each bet stage to signal bets to
 	 * all the players. Takes in global_state [g_state], returns unit*)
 	let switch (g_state : global_state) : unit = 

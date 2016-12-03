@@ -59,6 +59,10 @@ module Game_Engine : sig
 
 	val straight : card list -> int
 
+	val pair : card list -> int
+
+	val two_pair : card list -> int
+
     val high_card : hand -> int
 
     val full_house : hand -> int

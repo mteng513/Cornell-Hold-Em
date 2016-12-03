@@ -54,6 +54,8 @@ module Game_Engine : sig
 	 * final betting round *)
 	val river : global_state -> unit
 
+	val flush : card list -> int 
+
 	val straight : card list -> int
 
 	(* Score function for the engine. Transitions to the score stage, where the 

@@ -11,9 +11,9 @@ module Player : sig
 	 * hit 0. *)
 	type cash
 
-	(* Bet amt passed in. Returns true if bet succeeded, false
+	(* Bet amt passed in. Returns amount bet if possible or
 	 * otherwise. Bet must equal or exceed all other bets. *)
-	val bet : int -> bool 
+	val bet : int -> int 
 
 	(* Call the amount that has currently been bet. Returns true
 	 * if bet has succesfully been called. Player will go all in

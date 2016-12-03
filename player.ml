@@ -8,7 +8,10 @@ module Player = struct
 	type cash = int 
 
 	let bet amt = 
-		failwith "Unimplemented"
+		let state = get_state () in 
+		match !state.c_player with 
+			| 0 -> 0
+			| i -> i
 
 	let call () = 
 		failwith "Unimplemented"

@@ -80,21 +80,21 @@ module Game_Engine = struct
 	(* [reset_deck] resets the deck back to normal, full, ordered 52-card 
 	 * state, just like a freshly opened deck of cards. Returns a unit *)
 	let reset_deck () : unit = deck := 
-		[(Two, Clarkson); (Three, Clarkson); (Four, Clarkson); 
-		(Five, Clarkson); (Six, Clarkson); (Seven, Clarkson); 
-		(Eight, Clarkson); (Nine, Clarkson); (Ten, Clarkson); (Jack, Clarkson);
+		[(Two, Gries); (Three, Dijkstra); (Four, Clarkson); 
+		(Five, Gries); (Six, George); (Seven, Dijkstra); 
+		(Eight, George); (Nine, Clarkson); (Ten, Dijkstra); (Jack, George);
 		(Queen, Clarkson); (King, Clarkson); (Ace, Clarkson); 
-		(Two, Gries); (Three, Gries); (Four, Gries); (Five, Gries);
-		(Six, Gries); (Seven, Gries); (Eight, Gries); (Nine, Gries);
-		(Ten, Gries); (Jack, Gries); (Queen, Gries); (King, Gries);
+		(Two, Clarkson); (Three, George); (Four, George); (Five, George);
+		(Six, Dijkstra); (Seven, Gries); (Eight, Gries); (Nine, Gries);
+		(Ten, Gries); (Jack, Gries); (Queen, George); (King, Dijkstra);
 		(Ace, Gries);
-		(Two, Dijkstra); (Three, Dijkstra); (Four, Dijkstra); (Five, Dijkstra);
-		(Six, Dijkstra); (Seven, Dijkstra); (Eight, Dijkstra); 
-		(Nine, Dijkstra); (Ten, Dijkstra); (Jack, Dijkstra); (Queen, Dijkstra);
-		(King, Dijkstra); (Ace, Dijkstra);
-		(Two, George); (Three, George); (Four, George); (Five, George); 
-		(Six, George); (Seven, George); (Eight, George); (Nine, George);
-		(Ten, George); (Jack, George); (Queen, George); (King, George); 
+		(Two, George); (Three, Clarkson); (Four, Gries); (Five, Dijkstra);
+		(Six, Clarkson); (Seven, Clarkson); (Eight, Dijkstra); 
+		(Nine, George); (Ten, Clarkson); (Jack, Dijkstra); (Queen, Dijkstra);
+		(King, Gries); (Ace, Dijkstra);
+		(Two, Dijkstra); (Three, Gries); (Four, Dijkstra); (Five, Clarkson); 
+		(Six, Gries); (Seven, George); (Eight, Clarkson); (Nine, Dijkstra);
+		(Ten, George); (Jack, Clarkson); (Queen, Gries); (King, George); 
 		(Ace, George);
 		]
 

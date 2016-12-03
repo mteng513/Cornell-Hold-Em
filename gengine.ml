@@ -446,7 +446,7 @@ module Game_Engine = struct
 			[]
 
 	let full_house (hand: card list) : int =
-		let card_values = List.rev (make_enum_hand (three_kind_hand hand) []) in
+		let card_values = List.rev (make_enum_hand (full_house_hand hand) []) in
 		match card_values with
 		| t1::t2::t3::p1::p2::[] when t1 = t2 && t2 = t3 && p1 = p2 -> 18000000 + 1000 * t1 + p1
 		| p1::p2::t1::t2::t3::[] when t1 = t2 && t2 = t3 && p1 = p2 -> 18000000 + 1000 * t1 + p1
@@ -489,7 +489,19 @@ module Game_Engine = struct
 		let max_element = max_of_array bets in
 		index_in_array bets max_element 0 
 
-
+	let score_calculation (hand: card list): int =
+		match hand with
+		| hand when straight hand = 1000000000 -> straight hand
+		| hand when straight hand >= 20000000 -> straight hand
+		| hand when four_kind hand >= 19002000 -> four_kind hand
+		| hand when full_house hand >= 18002000 -> full_house hand
+		| hand when flush hand >= 16000000 -> flush hand
+		| hand when straight hand >= 15000000 -> straight hand
+		| hand when three_kind hand >= 1000000 -> three_kind hand
+		| hand when two_pair hand >= 100000 -> two_pair hand
+		| hand when pair hand >= 1500 -> pair hand
+		| hand when high_card hand > 0 -> high_card hand
+		| _ -> 0 
 
     (* [score g_state] takes in the global_state [g_state] (POTENTIALLY NEEDS MORE INPUTS)
      * and updates the winning players scores with the points they won from the
@@ -497,13 +509,14 @@ module Game_Engine = struct
 	let score (g_state : global_state) : unit = 
 		let max_score = max_of_array g_state.bets in
 		let max_index = index_in_array g_state.bets max_score 0 in
+		let score_array = Array.make 8 0 in 
 		let p_in_list = Array.to_list (g_state.players_in) in
-		for i = 0 to (List.length p_in_list) - 1 do
-			if (List.nth p_in_list i) 
-			then (* score their hand *) ()
-			else (* give them a zero *) ()
-		done
-
+		(for i = 0 to (List.length p_in_list) - 1 do
+			(if (List.nth p_in_list i) 
+			then Array.set score_array i (score_calculation ((List.nth g_state.hands i)@(g_state.cards_in_play))) 
+			else ());
+		done);
+		g_state.scores <- score_array
 		(* match p_in_list with
 		| a::b::c::d::e::f::g::h::[] -> () 
 		| _ -> () *)

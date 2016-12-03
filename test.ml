@@ -91,6 +91,9 @@ module Test_Game_Engine = struct
 		"Full House 4" >:: (fun _ -> assert_equal 18004014 (GEngine.full_house
 			[(Four, Gries); (Four, Clarkson); (Four, Gries); (Ace, Clarkson);
 			(Ace, Dijkstra)]));
+		"Two Pair 1" >:: (fun _ -> assert_equal 1401312 (Game_Engine.two_pair 
+			[(Ace,Gries); (Two, Gries); (Three, Clarkson); (Queen, Gries);
+			 (King, Gries);(King, Clarkson);(Ace, Clarkson)]))
 
 
 

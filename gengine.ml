@@ -425,12 +425,25 @@ module Game_Engine = struct
 	let two_pair_hand (hand: card list) : card list = 
 		let h = List.rev (sort_cards hand) in
 		if not (pair_hand h = []) then 
-			pair_hand h @ pair_hand (List.(h |> filter (fun x -> fst x != fst(List.hd h))))
+			pair_hand h @ pair_hand (List.(h |> filter (fun x -> fst x != fst(List.hd (pair_hand h)))))
 		else 
 			[]
 
+	let complete_two_pair_hand (hand: card list) (ints: int*int): card list =
+		let pre_unincluded_list = (rev_filter_card_rank hand (fst ints)) in
+		let unincluded_list = sort_cards (rev_filter_card_rank pre_unincluded_list (snd ints)) in
+		let len = List.length unincluded_list - 1 in
+		[List.nth unincluded_list len]
+
 	let two_pair (hand: card list) : int = 
-		let card_values = List.rev (make_enum_hand (three_kind_hand hand) []) in
+		(* let card_values = List.rev (make_enum_hand (two_pair_hand hand) []) in *)
+		let two_pair_cards = two_pair_hand hand in
+		let pair_ints = 
+			match two_pair_cards with
+			| fp1::fp2::sp1::sp2::[] -> (make_enum_rank (fst fp1), make_enum_rank (fst sp1))
+			| _ -> (0, 0)
+		in
+		let card_values = make_enum_hand (sort_cards (two_pair_hand hand @ complete_two_pair_hand hand pair_ints)) [] in
 		match card_values with
 		| h::fp1::fp2::sp1::sp2::[] when fp1 = fp2 && sp1 = sp2 -> 100000 * sp1 + 100 * fp1 + h
 		| fp1::fp2::h::sp1::sp2::[] when fp1 = fp2 && sp1 = sp2 -> 100000 * sp1 + 100 * fp1 + h

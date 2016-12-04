@@ -568,22 +568,29 @@ module Game_Engine = struct
 	 * Takes in the current_st [g_state], makes necessary updates to g_state,
 	 * and then returns unit *)
 	let rec signal_bet (g_state : global_state) (* current_player *) = 
-		print_endline ("Place your bet. 
-			The current bet is " ^ (string_of_int g_state.current_bet));
-		print_endline ("You have bet: " ^ (string_of_int (Array.get g_state.bets (g_state.c_player))));
+		print_endline ("The pot is " ^ (string_of_int g_state.pot));
+		print_endline ("The current bet is " ^ (string_of_int g_state.current_bet));
+		let past_bet_total = (Array.get g_state.bets (g_state.c_player)) in
+		print_endline ("You have bet: " ^ (string_of_int past_bet_total));
+		let chips_left = Array.get g_state.chips g_state.c_player in
+		print_endline ("Player " ^ (string_of_int g_state.c_player) ^ " has " ^ (string_of_int chips_left) ^ " left");
+		print_endline ("Make your bet");
+
 		let bet = read_int () in
 		(* must make every other player match the bet, raise, or fold *)
 		match bet with
 		(* if player raises, bet and pot both increase *)
-		| bet when bet + (Array.get g_state.bets (g_state.c_player)) > g_state.current_bet -> 
+		| bet when bet + past_bet_total > g_state.current_bet -> 
 							g_state.current_bet <- bet;
+							Array.set g_state.chips g_state.c_player (chips_left - bet); 
 							Array.set g_state.bets (g_state.c_player) bet;
 							g_state.pot <- g_state.pot+bet;
 							print_endline ("The pot is " ^ (string_of_int g_state.pot));
 							() (* -g_state.c_player_bet *)
 		(* if a player matches, the bet is added to the pot (can be 0) *)
-		| bet when bet + (Array.get g_state.bets (g_state.c_player)) = g_state.current_bet -> 
+		| bet when bet + past_bet_total = g_state.current_bet -> 
 								g_state.pot <- g_state.pot+bet;
+								Array.set g_state.chips g_state.c_player (chips_left - bet);
 								Array.set g_state.bets (g_state.c_player) g_state.current_bet;
 								print_endline ("The pot is " ^ (string_of_int g_state.pot)); () 
 								(* -g_state.bets c_player_bet *)
@@ -592,6 +599,18 @@ module Game_Engine = struct
 											^ " has folded");
 											Array.set g_state.players_in g_state.c_player false;
 											()
+		| bet when (bet > chips_left) && chips_left + past_bet_total > g_state.current_bet ->
+							g_state.current_bet <- chips_left;
+							Array.set g_state.chips g_state.c_player 0; 
+							Array.set g_state.bets (g_state.c_player) bet;
+							g_state.pot <- g_state.pot+bet;
+							print_endline ("The pot is " ^ (string_of_int g_state.pot));
+							()
+		| bet when (bet > chips_left) && (chips_left + past_bet_total = g_state.current_bet) -> 
+								g_state.pot <- g_state.pot+chips_left;
+								Array.set g_state.chips g_state.c_player 0;
+								Array.set g_state.bets (g_state.c_player) g_state.current_bet;
+								print_endline ("The pot is " ^ (string_of_int g_state.pot)); () 
 
 
 
@@ -619,8 +638,10 @@ module Game_Engine = struct
 	 * deck ref [deck] and updates the state with the hands. returns unit *)
 	let deal (g_state : global_state) (deck: deck ref) : unit =
 		(for i = 0 to (g_state.n_players - 1) do
-			g_state.hands <- 
-				([(pop deck); (pop deck)]::(g_state.hands));
+			(* if Array.get g_state.players_in i then *)
+				g_state.hands <- 
+					([(pop deck); (pop deck)]::(g_state.hands))
+			(* else g_state.hands <- []::g_state.hands *)
 		done);
 		g_state.hands <- List.rev g_state.hands;
 		transition_state g_state
@@ -690,6 +711,9 @@ module Game_Engine = struct
       let players = read_int () in
       !state.n_players <- players;
       !state.bets <- Array.make players 0;
+      !state.chips <- Array.make players 100;
+      !state.scores <- Array.make players 0;
+
 
       (* Shuffle deck. *)
       reset_deck (); shuffle (); shuffle (); shuffle (); shuffle ();

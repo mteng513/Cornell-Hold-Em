@@ -61,11 +61,17 @@ module Game_Engine : sig
 
 	val pair : card list -> int
 
+	val four_kind : card list -> int
+
+	val three_kind : card list -> int
+
 	val two_pair : card list -> int
 
     val high_card : hand -> int
 
     val full_house : hand -> int
+
+    val score_calculation : hand -> int
 
 	(* Score function for the engine. Transitions to the score stage, where the 
 	 * score of all hands still in is computed and the winner is declared. If

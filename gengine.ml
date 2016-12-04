@@ -636,11 +636,7 @@ module Game_Engine = struct
 		deal g_state deck; 
 
 		(* Bet after dealing. BET_ZERO state, transition to flop *)
-		(* COMMENT ON ERROR: switch also transitions state, so by the time 
-		 * transition_state is called, and then flop, the current_st = BET_TWO not BET_ONE
-		 *)
 		switch g_state;
-		transition_state g_state;
 
 		(* FOR NOW: Deal flop, then bet (taken care of in flop). Move on to turn *)
 		flop g_state;

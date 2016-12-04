@@ -252,9 +252,13 @@ module Test_Game_Engine = struct
 			>:: (fun _ -> assert_equal 19014013 
 			(Game_Engine.four_kind
 			[(Ace, Dijkstra); (Ace, George); (Ace, Gries); (Ace, Clarkson); 
-			 (Seven, Gries); (King, Gries); (Two, Clarkson)]));
+			 (Seven, Gries); (King, Gries); (Two, Clarkson)])); 
 
-		"Score Calc: Royal Flush (Should give score from Royal Flush 1 @ top" 
+		(* END OF INDIVIDUAL SCORE FUNCTION TESTS. 
+		 * Now, we run the same tests on the overarching "score calculation" 
+		 * function, making sure we get the same thing. *)
+
+		"Score Calc: Royal Flush" 
 			>:: (fun _ -> assert_equal 1000000000 
 			(Game_Engine.score_calculation
 			[(Ace, Gries); (Queen, Gries); (Jack, Gries); (Ace, Clarkson); 
@@ -265,7 +269,21 @@ module Test_Game_Engine = struct
 			[(Three, Gries); (Two, Gries); (Jack, George); (Ace, Clarkson); 
 			 (Seven, George); (Ten, Dijkstra); (Four, Clarkson)]));
 
-		(* SCORE *)
+		"Score Calc: Regular flush" >:: (fun _ -> assert_equal (16120643)
+	    (GEngine.score_calculation [(Ten, Gries); (Three, Gries); (Four, Gries); 
+	    	(Five, Clarkson); (Six, Gries); (Jack, Gries)]));
+
+		"Score Calc: Regular Straight" >:: (fun _ -> assert_equal 15000006
+		(GEngine.score_calculation [(Two, Gries); (Three, Gries); (Four, Gries); 
+			(Five, Clarkson); (Six, Gries); (Jack, Dijkstra)]));
+
+
+
+
+
+		(* END OF SCORE CALCULATION TESTS.
+		 * Now, we run a few tests to make sure state is properly updated
+		 * when scoring. *)
 		"Score 0a: Check that returns unit" >:: (fun _ -> assert_equal () 
 			(Game_Engine.score test_state));
 

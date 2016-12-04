@@ -648,6 +648,33 @@ module Game_Engine = struct
 		g_state.cards_in_play <- pop deck::g_state.cards_in_play;
 		printc (g_state.cards_in_play)
 
+	let find_winners (g_state: global_state) : int array = 
+		let winner = max_of_array (g_state.scores) in 
+		let winner_index = index_of_max (g_state.scores) in 
+		let winner_list = Array.make (Array.length g_state.scores -1) (-1) in 
+		(for i = winner_index to (Array.length g_state.scores - 1) 
+			do 
+			if (Array.get g_state.scores i) = winner 
+				then winner_list.(i) <- i
+			else ()
+		 done); winner_list
+
+	let award_chips (g_state: global_state) = 
+		let winners_list = Array.to_list (find_winners (g_state)) in 
+		let num_winners = 
+			List.length (List.filter (fun x -> x != (-1)) winners_list) in
+		let rec award lst g_state= 
+			match lst with 
+			|[]-> ()
+			|h::t -> 
+				if h != (-1) then 
+					((g_state.chips).(h) <- 
+					(g_state.pot/num_winners)+ (g_state.chips).(h); 
+					award t g_state)
+				else (award t g_state) in 
+		award winners_list g_state
+
+
 	(* [game_loop g_state] takes in the global_state [g_state] and updates it
 	 * as the game goes along. Terminates when a player has won the game
 	 *  *)
@@ -673,12 +700,17 @@ module Game_Engine = struct
 
 		(* Now, we are in the score stage. *)
 		score g_state;
-		transition_state g_state;
 
 		(* At this point, we want to do a few thing while not touching the 
 		 * state since the outter loop will need it to determine whether or 
 		 * not the game has ended. Score needs to allocate chips to whoever won
 		 * them. *)
+		 award_chips g_state;
+		 g_state.cards_in_play <- [];
+		 g_state.hands <- [];
+		 g_state.pot <- 0;
+		 g_state.current_bet <- 0;
+
 		 reset_deck (); shuffle (); shuffle (); shuffle (); shuffle (); shuffle () 
 
 	let init () = 

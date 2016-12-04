@@ -748,6 +748,7 @@ module Game_Engine = struct
       !state.bets <- Array.make players 0;
       !state.chips <- Array.make players 100;
       !state.scores <- Array.make players 0;
+      !state.players_in <- Array.make players true;
 
 
       (* Shuffle deck. *)

@@ -576,11 +576,23 @@ module Game_Engine = struct
 		(* if player raises, bet and pot both increase *)
 		| bet when bet > g_state.current_bet -> 
 							g_state.current_bet <- bet + g_state.current_bet;
-							g_state.pot <- g_state.pot+bet (* -g_state.c_player_bet *)
+							g_state.pot <- g_state.pot+bet;
+							print_endline ("The pot is " ^ (string_of_int g_state.pot));
+							() (* -g_state.c_player_bet *)
 		(* if a player matches, the bet is added to the pot (can be 0) *)
-		| bet when bet = g_state.current_bet -> g_state.pot <- g_state.pot+bet (* -g_state.bets c_player_bet *)
+		| bet when bet = g_state.current_bet -> 
+								g_state.pot <- g_state.pot+bet;
+								print_endline ("The pot is " ^ (string_of_int g_state.pot)); () 
+								(* -g_state.bets c_player_bet *)
 		(* if a player decides not to bet, they fold *)
-		| bet when bet = 0 -> () (* this means the player folds *)
+		| bet when bet = 0 -> print_endline ("Player " ^ (string_of_int g_state.c_player)
+											^ " has folded");
+											Array.set g_state.players_in g_state.c_player false;
+											()
+
+
+
+		(* this means the player folds *)
 		(* if negative # or # less than bet, retry *)
 		| _ -> print_endline "invalid input received. try again"; 
 							signal_bet g_state

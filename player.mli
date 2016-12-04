@@ -13,7 +13,7 @@ module Player : sig
 
 	(* Bet amt passed in. Returns amount bet if possible or
 	 * otherwise. Bet must equal or exceed all other bets. *)
-	val bet : int -> int 
+	val bet : int -> unit
 
 	(* Call the amount that has currently been bet. Returns true
 	 * if bet has succesfully been called. Player will go all in

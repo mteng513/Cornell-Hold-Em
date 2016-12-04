@@ -428,7 +428,7 @@ module Game_Engine = struct
 	let two_pair_hand (hand: card list) : card list = 
 		let h = List.rev (sort_cards hand) in
 		if not (pair_hand h = []) then 
-			pair_hand h @ pair_hand (List.(h |> filter (fun x -> fst x != fst(List.hd (pair_hand h)))))
+			pair_hand h @ pair_hand (List.(h |> filter (fun x -> fst x <> fst(List.hd (pair_hand h)))))
 		else 
 			[]
 
@@ -457,7 +457,7 @@ module Game_Engine = struct
 	let full_house_hand (hand: card list) : card list = 
 		let h = List.rev (sort_cards hand) in 
 		if not (three_kind_hand h = []) then  
-			(three_kind_hand h) @ (pair_hand (List.(h |> filter (fun x -> fst x != fst(List.hd (three_kind_hand h))))))
+			(three_kind_hand h) @ (pair_hand (List.(h |> filter (fun x -> fst x <> fst(List.hd (three_kind_hand h))))))
 		else 
 			[]
 
@@ -525,7 +525,7 @@ module Game_Engine = struct
 	let score (g_state : global_state) : unit = 
 		let max_score = max_of_array g_state.bets in
 		let max_index = index_in_array g_state.bets max_score 0 in
-		let score_array = Array.make 8 0 in 
+		let score_array = Array.make g_state.n_players 0 in 
 		let p_in_list = Array.to_list (g_state.players_in) in
 		(for i = 0 to (List.length p_in_list) - 1 do
 			(if (List.nth p_in_list i) 
@@ -672,7 +672,7 @@ module Game_Engine = struct
 	let find_winners (g_state: global_state) : int array = 
 		let winner = max_of_array (g_state.scores) in 
 		let winner_index = index_of_max (g_state.scores) in 
-		let winner_list = Array.make (Array.length g_state.scores -1) (-1) in 
+		let winner_list = Array.make (Array.length g_state.scores) (-1) in 
 		(for i = winner_index to (Array.length g_state.scores - 1) 
 			do 
 			if (Array.get g_state.scores i) = winner 
@@ -683,12 +683,12 @@ module Game_Engine = struct
 	let award_chips (g_state: global_state) = 
 		let winners_list = Array.to_list (find_winners (g_state)) in 
 		let num_winners = 
-			List.length (List.filter (fun x -> x != (-1)) winners_list) in
+			List.length (List.filter (fun x -> x <> (-1)) winners_list) in
 		let rec award lst g_state= 
 			match lst with 
 			|[]-> ()
 			|h::t -> 
-				if h != (-1) then 
+				if h <> (-1) then 
 					((g_state.chips).(h) <- 
 					(g_state.pot/num_winners)+ (g_state.chips).(h); 
 					award t g_state)

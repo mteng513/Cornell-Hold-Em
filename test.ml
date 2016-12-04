@@ -19,7 +19,8 @@ module Test_Game_Engine = struct
 			[(King, Clarkson);(Ace, Clarkson)];[];[];[];[];[];[]];
 		bets = [|0;0;0;0;0;0;0;0|]; 
 		players_in = [|true; true; true; false; false; false; false; false|];
-		scores = [|0;0;0;0;0;0;0;0|]}
+		scores = [|0;0;0;0;0;0;0;0|];
+		chips = [|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
 	let test_state_after = {GEngine.current_st = START; 
 		cards_in_play = [(Ace, Gries); (Two, Gries);
@@ -30,7 +31,8 @@ module Test_Game_Engine = struct
 	 		[(King, Clarkson); (Ace, Clarkson)];[]; []; []; []; []; []];
  		bets = [|0; 0; 0; 0; 0; 0; 0; 0|];
  		players_in = [|true; true; true; false; false; false; false; false|];
- 		scores = [|1000000000; 1401312; 2322; 0; 0; 0; 0; 0|]}
+ 		scores = [|1000000000; 1401312; 2322; 0; 0; 0; 0; 0|];
+ 		chips = [|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
  	let test_b = {GEngine.current_st = START;                                                                                                                                                       
    		cards_in_play = [(Nine, George); (Ace, Dijkstra);
@@ -41,7 +43,8 @@ module Test_Game_Engine = struct
    			[(King, Clarkson); (Ace, Clarkson)]];
    		bets = [|0; 0; 0; 0; 0; 0; 0; 0|];
    		players_in = [|true; true; false; false; false; false; false; false|];
-   		scores = [|0; 0; 0; 0; 0; 0; 0; 0|]}
+   		scores = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   		chips = [|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
    	let test_b_after = {GEngine.current_st = START; 
    		cards_in_play = [(Nine, George); (Ace, Dijkstra);
@@ -52,7 +55,8 @@ module Test_Game_Engine = struct
  			[(King, Clarkson); (Ace, Clarkson)]];
  		bets = [|0; 0; 0; 0; 0; 0; 0; 0|];
  		players_in = [|true; true; false; false; false; false; false; false|];
- 		scores = [|15000011; 22419; 0; 0; 0; 0; 0; 0|]}
+ 		scores = [|15000011; 22419; 0; 0; 0; 0; 0; 0|];
+ 		chips = [|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
 	let tests = "test suite" >::: [
 

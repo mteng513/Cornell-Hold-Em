@@ -27,6 +27,7 @@ module Game_Engine = struct
 		mutable bets : int array;
 		mutable players_in : bool array;
 		mutable scores: int array;
+		mutable chips: int array
 	}
 
 	exception GameEnded
@@ -37,7 +38,7 @@ module Game_Engine = struct
 	let deck = ref [] 
 	let state = ref {current_st = START; cards_in_play = []; pot = 0;
 		current_bet = 0; n_players = 0; c_player = 0; hands = []; 
-		bets = [||]; players_in = [||]; scores = [||]}
+		bets = [||]; players_in = [||]; scores = [||]; chips = [||]}
 
 	(* [suit_to_string suit] takes in a suit [suit] and returns its
 	 * string representation formatted for printing *)

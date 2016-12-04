@@ -30,6 +30,7 @@ module Game_Engine : sig
 		mutable bets : int array;
 		mutable players_in : bool array;
 		mutable scores: int array;
+		mutable chips: int array
 	}
 
 	(* Switch function - performs the transition from player to player

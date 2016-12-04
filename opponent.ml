@@ -156,45 +156,63 @@ module Opponent = struct
  
   (* General helper for bets after the first. *)
   let bet_helper cardlst = 
-  	if ((straight cardlst) > 0) then ignore (bet (Random.int 750))
-  	else if ((flush cardlst) > 4) then ignore (bet (Random.int 500));
+  	let current_score = score_calculation cardlst in
 
-  	check ()
+  	(* Royal Flush. Bet Everything *)
+  	if (current_score >= 100000000) then ignore (bet (Random.int 750))
+
+  	(* Straight flush. Bet everything *)
+  	else if (current_score >= 20000005) then ignore (bet (Random.int 750))
+
+  	(* Four of a kind. Bet a good amount *)
+  	else if (current_score >= 19002003) then ignore (bet (Random.int 500))
+
+  	(* Full House. Bet a decent amount. *)
+  	else if (current_score >= 18002003) then ignore (bet (Random.int 300))
+
+  	(* Manual check for flush (if we are close, we should bet) *)
+  	else if ((flush cardlst) >= 4) then ignore (bet (Random.int 200))
+
+  	(* Straight. Bet a decent amount. *)
+  	else if (current_score >= 15000002) then ignore (bet (Random.int 150))
+
+  	(* 3 of a kind. Bet a decent amount *)
+  	else if (current_score >= 2000000) then ignore (bet (Random.int 100))
+
+  	(* 2 pair. Bet a little. *)
+  	else if (current_score >= 200000) then ignore (bet (Random.int 50))
+
+  	(* Pair. Bet a tiny bit. *)
+  	else if (current_score >= 2000) then ignore (bet (Random.int 20))
+
+  	else check ()
 
   (* Sorts cards by RANK. *)
   let sort_cards (h:hand) : hand = 
 		List.sort Pervasives.compare h
 
+	let twofifty_bet cards current_bet = failwith "TODO"
 
-	(* Returns maximum bet applicable given the cards in the hand. *)
-	let max_bet cardlst = 
-		if ((straight cardlst) > 0) then 750
-  	else if ((flush cardlst) > 4) then 500
-  	else 50 
+	let sixhun_bet cards current_bet = failwith "TODO"
 
-	let twofifty_bet () = failwith "TODO"
+	let thous_bet cards current_bet = failwith "TODO"
 
-	let sixhun_bet () = failwith "TODO"
-
-	let thous_bet () = failwith "TODO"
-
-	let bluff_bet () = failwith "TODO"
+	let bluff_bet cards current_bet = failwith "TODO"
 
   (* Secondary decision function for the second round of betting. *)
-  let decide_two () = 
+  let decide_two cards = 
   	let st = get_state () in 
-  	let player_index = !st.c_player in 
-  	let hands = !st.hands in
   	let current_bet = !st.current_bet in 
 
-  	if current_bet < 100 then call () 
-  	else if current_bet < 250 then twofifty_bet () 
-  	else if current_bet < 600 then sixhun_bet () 
-  	else if current_bet < 1000 then thous_bet () 
-  	else  bluff_bet ()
+  	if current_bet < 100 then bet current_bet 
+  	else if current_bet < 250 then twofifty_bet cards current_bet  
+  	else if current_bet < 600 then sixhun_bet cards current_bet   
+  	else if current_bet < 1000 then thous_bet cards current_bet   
+  	else  bluff_bet cards current_bet  
 
 	(* Main decision function for the opponent. *)
   let decide () = 
+  	Random.self_init();
   	let st = get_state () in 
   	let player_index = !st.c_player in 
   	let hands = !st.hands in 
@@ -202,11 +220,14 @@ module Opponent = struct
   	match (List.nth hands player_index) with 
   		| ((c1::c2::[])) -> let hand = (c1::c2::[]) in 
 
+  	let playcards = (sort_cards (hand @ !st.cards_in_play)) in
+
+  	if (!st.current_bet > 0) then decide_two playcards else 
   		(match !st.current_st with
   			| BET_ZERO -> bet_zero_helper (sort_cards hand)
-  			| BET_ONE -> bet_helper (sort_cards (hand @ !st.cards_in_play))
-  			| BET_TWO -> bet_helper (sort_cards (hand @ !st.cards_in_play))
-  			| BET_THREE -> bet_helper (sort_cards (hand @ !st.cards_in_play))
+  			| BET_ONE -> bet_helper playcards
+  			| BET_TWO -> bet_helper playcards
+  			| BET_THREE -> bet_helper playcards
   			| _ -> ())
 
   		| _ -> failwith "Failure: bad hand"

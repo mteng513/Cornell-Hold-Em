@@ -128,6 +128,7 @@ module Game_Engine = struct
 				shuffle_helper tt lst2 lst3 lst4 lst1 lst8 lst5 lst6 lst7
 
 	let cut () = 
+		Random.self_init();
 		let a_list = ref [] in
 		let b_list = ref [] in 
 		(for i = 0 to 51 do 
@@ -140,6 +141,7 @@ module Game_Engine = struct
 	 * pushed onto, punts to the helper, then sets the deck equal to
 	 * the newly shuffeled deck. *)
 	let shuffle () = 
+		Random.self_init();
 		let a_list = ref [] in 
 		let b_list = ref [] in 
 		let c_list = ref [] in 
@@ -588,9 +590,11 @@ module Game_Engine = struct
 	let switch (g_state : global_state) : unit = 
 		match g_state.current_st with 
 			| BET_ZERO | BET_ONE | BET_TWO | BET_THREE ->
+				signal_bet g_state; 
+				g_state.c_player <- g_state.c_player + 1;
 				(while not (g_state.c_player = index_of_max g_state.bets) do 
 					signal_bet g_state; 
-					g_state.c_player <- g_state.c_player + 1; done);
+					g_state.c_player <- (g_state.c_player + 1) mod g_state.n_players; done);
 				g_state.c_player <- 0;
 				transition_state g_state;
 			| _ -> failwith "Bad state"

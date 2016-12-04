@@ -570,17 +570,18 @@ module Game_Engine = struct
 	let rec signal_bet (g_state : global_state) (* current_player *) = 
 		print_endline ("Place your bet. 
 			The current bet is " ^ (string_of_int g_state.current_bet));
+		print_endline ("You have bet: " ^ (string_of_int (Array.get g_state.bets (g_state.c_player))));
 		let bet = read_int () in
 		(* must make every other player match the bet, raise, or fold *)
 		match bet with
 		(* if player raises, bet and pot both increase *)
-		| bet when bet > g_state.current_bet -> 
+		| bet when bet + (Array.get g_state.bets (g_state.c_player)) > g_state.current_bet -> 
 							g_state.current_bet <- bet + g_state.current_bet;
 							g_state.pot <- g_state.pot+bet;
 							print_endline ("The pot is " ^ (string_of_int g_state.pot));
 							() (* -g_state.c_player_bet *)
 		(* if a player matches, the bet is added to the pot (can be 0) *)
-		| bet when bet = g_state.current_bet -> 
+		| bet when bet + (Array.get g_state.bets (g_state.c_player)) = g_state.current_bet -> 
 								g_state.pot <- g_state.pot+bet;
 								print_endline ("The pot is " ^ (string_of_int g_state.pot)); () 
 								(* -g_state.bets c_player_bet *)
@@ -604,7 +605,7 @@ module Game_Engine = struct
 		match g_state.current_st with 
 			| BET_ZERO | BET_ONE | BET_TWO | BET_THREE ->
 				signal_bet g_state; 
-				g_state.c_player <- g_state.c_player + 1;
+				g_state.c_player <- (g_state.c_player + 1) mod g_state.n_players;
 				(while not (g_state.c_player = index_of_max g_state.bets) do 
 					signal_bet g_state; 
 					g_state.c_player <- (g_state.c_player + 1) mod g_state.n_players; done);
@@ -617,8 +618,9 @@ module Game_Engine = struct
 	let deal (g_state : global_state) (deck: deck ref) : unit =
 		(for i = 0 to (g_state.n_players - 1) do
 			g_state.hands <- 
-				((g_state.hands)(* @[pop deck; pop deck] *));
+				([(pop deck); (pop deck)]::(g_state.hands));
 		done);
+		g_state.hands <- List.rev g_state.hands;
 		transition_state g_state
 
 	(* [flop g_state] takes in the global_state [g_state] and updates it with

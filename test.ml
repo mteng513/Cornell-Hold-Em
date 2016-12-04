@@ -67,6 +67,148 @@ module Test_Game_Engine = struct
  		scores = [|15000011; 22419; 0; 0; 0; 0; 0; 0|];
  		chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
+ 	let test_c = {GEngine.current_st = START;                                                                                                                                                       
+   	cards_in_play = [(Jack, Gries); (Queen, Gries);
+   	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
+   	pot = 100000; 
+   	current_bet = 0; n_players = 0; c_player = 0;
+   	hands = [[(Ace, Gries); (Ten, Gries)];
+   		[(Three, Gries); (Three, George)]];
+   	bets = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   	players_in = [|true; true; false; false; false; false; false; false|];
+   	scores = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
+
+  let test_c_after = {GEngine.current_st = START;                                                                                                                                                       
+   	cards_in_play = [(Jack, Gries); (Queen, Gries);
+   	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
+   	pot = 100000; 
+   	current_bet = 0; n_players = 0; c_player = 0;
+   	hands = [[(Ace, Gries); (Ten, Gries)];
+   		[(Three, Gries); (Three, George)]];
+   	bets = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   	players_in = [|true; true; false; false; false; false; false; false|];
+   	scores = [|1000000000; 3001312; 0; 0; 0; 0; 0; 0|];
+   	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
+
+  let test_d = {GEngine.current_st = START;                                                                                                                                                       
+   	cards_in_play = [(Jack, Gries); (Queen, Gries);
+   	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
+   	pot = 100000; 
+   	current_bet = 0; n_players = 0; c_player = 0;
+   	hands = [[(Ace, Gries); (Ten, Gries)];
+   		[(Three, Gries); (Three, George)]; 
+   		[(Nine, Gries); (Four, Gries)]];
+   	bets = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   	players_in = [|true; true; true; false; false; false; false; false|];
+   	scores = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
+
+  let test_d_after = {GEngine.current_st = START;                                                                                                                                                       
+   	cards_in_play = [(Jack, Gries); (Queen, Gries);
+   	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
+   	pot = 100000; 
+   	current_bet = 0; n_players = 0; c_player = 0;
+   	hands = [[(Ace, Gries); (Ten, Gries)];
+   		[(Three, Gries); (Three, George)];
+   		[(Nine, Gries); (Four, Gries)]];
+   	bets = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   	players_in = [|true; true; true; false; false; false; false; false|];
+   	scores = [|1000000000; 3001312; 16143194; 0; 0; 0; 0; 0|];
+   	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
+
+  let test_e = {GEngine.current_st = START;                                                                                                                                                       
+   	cards_in_play = [(Jack, Gries); (Queen, Gries);
+   	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
+   	pot = 100000; 
+   	current_bet = 0; n_players = 0; c_player = 0;
+   	hands = [[(Ace, Gries); (Ten, Gries)];
+   		[(Three, Gries); (Three, George)]; 
+   		[(Nine, Gries); (Four, Gries)];
+   		[(Jack, Dijkstra); (Eight, George)]];
+   	bets = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   	players_in = [|true; true; true; true; false; false; false; false|];
+   	scores = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
+
+  let test_e_after = {GEngine.current_st = START;                                                                                                                                                       
+   	cards_in_play = [(Jack, Gries); (Queen, Gries);
+   	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
+   	pot = 100000; 
+   	current_bet = 0; n_players = 0; c_player = 0;
+   	hands = [[(Ace, Gries); (Ten, Gries)];
+   		[(Three, Gries); (Three, George)];
+   		[(Nine, Gries); (Four, Gries)];
+   		[(Jack, Dijkstra); (Eight, George)]];
+   	bets = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   	players_in = [|true; true; true; true; false; false; false; false|];
+   	scores = [|1000000000; 3001312; 16143194; 1100813; 0; 0; 0; 0|];
+   	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
+
+  let test_f = {GEngine.current_st = START;                                                                                                                                                       
+   	cards_in_play = [(Jack, Gries); (Queen, Gries);
+   	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
+   	pot = 100000; 
+   	current_bet = 0; n_players = 0; c_player = 0;
+   	hands = [[(Ace, Gries); (Ten, Gries)];
+   		[(Three, Gries); (Three, George)]; 
+   		[(Nine, Gries); (Four, Gries)];
+   		[(Jack, Dijkstra); (Eight, George)];
+   		[(Queen, Dijkstra); (Two, George)]];
+   	bets = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   	players_in = [|true; true; true; true; true; false; false; false|];
+   	scores = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
+
+  let test_f_after = {GEngine.current_st = START;                                                                                                                                                       
+   	cards_in_play = [(Jack, Gries); (Queen, Gries);
+   	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
+   	pot = 100000; 
+   	current_bet = 0; n_players = 0; c_player = 0;
+   	hands = [[(Ace, Gries); (Ten, Gries)];
+   		[(Three, Gries); (Three, George)];
+   		[(Nine, Gries); (Four, Gries)];
+   		[(Jack, Dijkstra); (Eight, George)];
+   		[(Queen, Dijkstra); (Two, George)]];
+   	bets = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   	players_in = [|true; true; true; true; true; false; false; false|];
+   	scores = [|1000000000; 3001312; 16143194; 1100813; 19418; 0; 0; 0|];
+   	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
+
+  let test_g = {GEngine.current_st = START;                                                                                                                                                       
+   	cards_in_play = [(Jack, Gries); (Queen, Gries);
+   	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
+   	pot = 100000; 
+   	current_bet = 0; n_players = 0; c_player = 0;
+   	hands = [[(Ace, Gries); (Ten, Gries)];
+   		[(Three, Gries); (Three, George)]; 
+   		[(Nine, Gries); (Four, Gries)];
+   		[(Jack, Dijkstra); (Eight, George)];
+   		[(Queen, Dijkstra); (Two, George)];
+   		[(Nine, Dijkstra); (Four, George)]];
+   	bets = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   	players_in = [|true; true; true; true; true; true; false; false|];
+   	scores = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
+
+  let test_g_after = {GEngine.current_st = START;                                                                                                                                                       
+   	cards_in_play = [(Jack, Gries); (Queen, Gries);
+   	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
+   	pot = 100000; 
+   	current_bet = 0; n_players = 0; c_player = 0;
+   	hands = [[(Ace, Gries); (Ten, Gries)];
+   		[(Three, Gries); (Three, George)];
+   		[(Nine, Gries); (Four, Gries)];
+   		[(Jack, Dijkstra); (Eight, George)];
+   		[(Queen, Dijkstra); (Two, George)];
+   		[(Nine, Dijkstra); (Four, George)]];
+   	bets = [|0; 0; 0; 0; 0; 0; 0; 0|];
+   	players_in = [|true; true; true; true; true; true; false; false|];
+   	scores = [|1000000000; 3001312; 16143194; 1100813; 19418; 2218; 0; 0|];
+   	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
+
+  (* End of state definitions for later tests. Unit tests begin here. *)
+
 	let tests = "test suite" >::: [
 
 		"Royal Flush 0" >:: (fun _ -> assert_equal 1000000000 
@@ -475,7 +617,7 @@ module Test_Game_Engine = struct
 
 		(* END OF SCORE CALCULATION TESTS.
 		 * Now, we run a few tests to make sure state is properly updated
-		 * when scoring. *)
+		 * when scoring. The tests get increasingly more complex. *)
 
 		"Score 0a: Check that returns unit" >:: (fun _ -> assert_equal () 
 			(Game_Engine.score test_state));
@@ -490,12 +632,29 @@ module Test_Game_Engine = struct
 		"Score 1b: Straight vs pair" >:: (fun _ -> assert_equal test_b_after
 			(Game_Engine.score test_b; test_b));
 
+		"Score 2a: Check that returns unit" >:: (fun _ -> assert_equal () 
+			(Game_Engine.score test_b));
+
+		"Score 2b: Royal Flush vs triple" >:: (fun _ -> assert_equal test_c_after
+			(Game_Engine.score test_c; test_c));
+
+		"Score 3: Royal Flush vs triple vs flush" >:: 
+			(fun _ -> assert_equal test_d_after (Game_Engine.score test_d; test_d));
+
+		"Score 4: Royal Flush vs triple vs flush vs 2pair" >:: 
+			(fun _ -> assert_equal test_e_after (Game_Engine.score test_e; test_e));
+
+		"Score 5: Royal Flush vs triple vs flush vs 2pair vs pair" >:: 
+			(fun _ -> assert_equal test_f_after (Game_Engine.score test_f; test_f));
+
+		"Score 6: Royal Flush vs triple vs flush vs 2pair vs pair vs high card" >:: 
+			(fun _ -> assert_equal test_g_after (Game_Engine.score test_g; test_g));
+
 		]
 
 end
 
 module Test_Engine = Test_Game_Engine
-
 
 let tests = Test_Engine.tests 
 

@@ -146,134 +146,137 @@ module Test_Game_Engine = struct
 			[(Four, Gries); (Four, Clarkson); (Four, Gries); (Ace, Clarkson);
 			(Ace, Dijkstra)]));
 
-		"Two Pair 0" >:: (fun _ -> assert_equal 0 
+		"Two Pair: Only 1 pair" >:: (fun _ -> assert_equal 0 
 			(Game_Engine.two_pair 
 			[(Ace,Gries); (Two, Gries); (Three, Clarkson); (Queen, Gries);
 			 (King, Gries);(Jack, Clarkson);(Ace, Clarkson)]));
 
-		"Two Pair 1" >:: (fun _ -> assert_equal 1401312 
+		"Two Pair: Ace, King" >:: (fun _ -> assert_equal 1401312 
 			(Game_Engine.two_pair 
 			[(Ace,Gries); (Two, Gries); (Three, Clarkson); (Queen, Gries);
 			 (King, Gries);(King, Clarkson);(Ace, Clarkson)]));
 
-		"Two Pair 2" >:: (fun _ -> assert_equal 0 
+		"Two Pair: Only 1 pair (3 of a kind)" >:: (fun _ -> assert_equal 0 
 			(Game_Engine.two_pair 
 			[(Ace,Gries); (Two, Gries); (Three, Clarkson); (Queen, Gries);
 			 (King, Gries);(Ace, Clarkson);(Ace, Clarkson)]));
 
-		"Two Pair 3" >:: (fun _ -> assert_equal 1401213 
+		"Two Pair: Ace, Queen" >:: (fun _ -> assert_equal 1401213 
 			(Game_Engine.two_pair 
 			[(Ace,Gries); (Two, Gries); (Three, Clarkson); (Queen, Gries);
  			(King, Gries);(Queen, Clarkson);(Ace, Clarkson)]));
 
-		"Two Pair 4" >:: (fun _ -> assert_equal 0 
+		"Two Pair: 4 Aces (4 of a kind)" >:: (fun _ -> assert_equal 0 
 			(Game_Engine.two_pair 
 			[(Ace, Gries); (Two, Gries); (Three, Clarkson); (Ace, George);
 			(Ace, Dijkstra); (Ace, Clarkson)]));
 
-		"Pair 0" >:: (fun _ -> assert_equal 0 
+		"Pair: None" >:: (fun _ -> assert_equal 0 
 			(Game_Engine.pair
 			[(Ace, Gries); (Two, Gries); (Three, Clarkson); (King, George);
 			(Seven, Dijkstra); (Ten, Clarkson)]));
 
-		"Pair 1" >:: (fun _ -> assert_equal 22442 
+		"Pair: Ace" >:: (fun _ -> assert_equal 22442 
 			(Game_Engine.pair
 			[(Ace, Gries); (Two, Gries); (Three, Clarkson); 
 			(Queen, Gries); (King, Gries);
 	        (King, Clarkson); (Ace, Clarkson)]));
 
-		"Pair 2" >:: (fun _ -> assert_equal 21023 
+		"Pair: King (and Two)" >:: (fun _ -> assert_equal 21023 
 			(Game_Engine.pair
 			[(Ace, Gries); (Two, Gries); (Three, Clarkson); (Queen, Gries); (King, Gries);
 	        (King, Clarkson); (Two, Clarkson)]));
 
-		"Pair 3" >:: (fun _ -> assert_equal 4426 
+		"Pair: Twos (3 of a kind) has Six" >:: (fun _ -> assert_equal 4426 
 			(Game_Engine.pair
 			[(Two, George); (Two, Gries); (Three, Clarkson); (Queen, Gries);
 			(King, Gries); (Six, Dijkstra); (Two, Clarkson)]));
 
-		"Pair 4" >:: (fun _ -> assert_equal 4427 
+		"Pair: Twos (3 of a kind) has Seven" >:: (fun _ -> assert_equal 4427 
 			(Game_Engine.pair
 			[(Two, George); (Two, Gries); (Three, Clarkson); (Queen, Gries);
  			 (King, Gries); (Seven, Dijkstra); (Two, Clarkson)]));
 
-		"Pair 5" >:: (fun _ -> assert_equal 20732 
+		"Pair: King (and Two (3 of a kind))" >:: (fun _ -> assert_equal 20732 
 			(Game_Engine.pair
 			[(Two, George); (Two, Gries); (Three, Clarkson); (Queen, Gries);
 			 (King, Gries); (King, Clarkson); (Two, Clarkson)]));
 
-		"Three Kind 0" >:: (fun _ -> assert_equal 2001313 
+		"Three Kind: Two" >:: (fun _ -> assert_equal 2001313 
 			(Game_Engine.three_kind
 			[(Two, George); (Two, Gries); (Three, Clarkson); (Queen, Gries);
 			 (King, Gries); (King, Clarkson); (Two, Clarkson)]));
 
-		"Three Kind 1" >:: (fun _ -> assert_equal 2001313 
+		"Three Kind: Two (4 of a kind)" >:: (fun _ -> assert_equal 2001313 
 			(Game_Engine.three_kind
 			[(Two, George); (Two, Gries); (Two, Clarkson); (Queen, Gries);
 			 (King, Gries); (King, Clarkson); (Two, Dijkstra)]));
 
-		"Three Kind 2" >:: (fun _ -> assert_equal 3001302 
+		"Three Kind: Two and Three" >:: (fun _ -> assert_equal 3001302 
 			(Game_Engine.three_kind
 			[(Two, George); (Two, Gries); (Three, Clarkson); (Three, Gries);
 			 (King, Gries); (Three, Dijkstra); (Two, Clarkson)]));
 
-		"Three Kind 3" >:: (fun _ -> assert_equal 0 
+		"Three Kind: None" >:: (fun _ -> assert_equal 0 
 			(Game_Engine.three_kind
 			[(Four, George); (Five, Gries); (Three, Clarkson); (Seven, Gries);
 			 (King, Gries); (Three, Dijkstra); (Two, Clarkson)]));
 
-		"Three Kind 4" >:: (fun _ -> assert_equal 4001307 
+		"Three Kind: Four (4 of a kind)" >:: (fun _ -> assert_equal 4001307 
 			(Game_Engine.three_kind
 			[(Four, George); (Four, Gries); (Four, Clarkson); (Seven, Gries);
 			 (King, Gries); (Four, Dijkstra); (Two, Clarkson)]));
 
-		"Three Kind 5" >:: (fun _ -> assert_equal 14001307 
+		"Three Kind: Ace" >:: (fun _ -> assert_equal 14001307 
 			(Game_Engine.three_kind
 			[(Ace, George); (Ace, Gries); (Four, Clarkson); (Seven, Gries);
 			 (King, Gries); (Ace, Dijkstra); (Two, Clarkson)]));
 
-		"Four Kind 0" >:: (fun _ -> assert_equal 19004013 
+		"Four Kind: Four" >:: (fun _ -> assert_equal 19004013 
 			(Game_Engine.four_kind
 			[(Four, George); (Four, Gries); (Four, Clarkson); (Seven, Gries);
 			 (King, Gries); (Four, Dijkstra); (Two, Clarkson)]));
 
-		"Four Kind 1" >:: (fun _ -> assert_equal 0 
+		"Four Kind: None" >:: (fun _ -> assert_equal 0 
 			(Game_Engine.four_kind
 			[(Four, George); (Three, Gries); (Four, Clarkson); (Seven, Gries);
 			 (King, Gries); (Four, Dijkstra); (Two, Clarkson)]));
 
-		"Four Kind 2" >:: (fun _ -> assert_equal 19014013 
+		"Four Kind: Ace" >:: (fun _ -> assert_equal 19014013 
 			(Game_Engine.four_kind
 			[(Ace, George); (Ace, Gries); (Four, Clarkson); (Seven, Gries);
 			 (King, Gries); (Ace, Dijkstra); (Ace, Clarkson)]));
 
 		(* Order of cards shouldn't change score *)
-		"Four Kind 3" >:: (fun _ -> assert_equal 19014013 
+		"Four Kind: Ace (chaning order shouldn't change score)" 
+			>:: (fun _ -> assert_equal 19014013 
 			(Game_Engine.four_kind
 			[(Ace, Dijkstra); (Ace, George); (Ace, Gries); (Ace, Clarkson); 
 			 (Seven, Gries); (King, Gries); (Two, Clarkson)]));
 
-		"Score Calc 0" >:: (fun _ -> assert_equal 1000000000 
+		"Score Calc: Royal Flush (Should give score from Royal Flush 1 @ top" 
+			>:: (fun _ -> assert_equal 1000000000 
 			(Game_Engine.score_calculation
 			[(Ace, Gries); (Queen, Gries); (Jack, Gries); (Ace, Clarkson); 
 			 (King, Gries); (Ten, Gries); (Two, Clarkson)]));
 
-		"Score Calc 1" >:: (fun _ -> assert_equal 2224 
+		"Score Calc: High Card (no hand)" >:: (fun _ -> assert_equal 2224 
 			(Game_Engine.score_calculation
 			[(Three, Gries); (Two, Gries); (Jack, George); (Ace, Clarkson); 
 			 (Seven, George); (Ten, Dijkstra); (Four, Clarkson)]));
 
 		(* SCORE *)
-		"Score 0a" >:: (fun _ -> assert_equal () 
+		"Score 0a: Check that returns unit" >:: (fun _ -> assert_equal () 
 			(Game_Engine.score test_state));
 
-		"Score 0b" >:: (fun _ -> assert_equal test_state_after 
+		"Score 0b: Royal Flush vs 2 pair" 
+			>:: (fun _ -> assert_equal test_state_after 
 			(Game_Engine.score test_state; test_state));
 
-		"Score 1a" >:: (fun _ -> assert_equal () 
+		"Score 1a: Check that returns unit" >:: (fun _ -> assert_equal () 
 			(Game_Engine.score test_b));
 
-		"Score 1b" >:: (fun _ -> assert_equal test_b_after 
+		"Score 1b: Straight vs pair" >:: (fun _ -> assert_equal test_b_after
 			(Game_Engine.score test_b; test_b));
 
 		]

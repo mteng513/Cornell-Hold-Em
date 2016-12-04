@@ -576,13 +576,15 @@ module Game_Engine = struct
 		match bet with
 		(* if player raises, bet and pot both increase *)
 		| bet when bet + (Array.get g_state.bets (g_state.c_player)) > g_state.current_bet -> 
-							g_state.current_bet <- bet + g_state.current_bet;
+							g_state.current_bet <- bet;
+							Array.set g_state.bets (g_state.c_player) bet;
 							g_state.pot <- g_state.pot+bet;
 							print_endline ("The pot is " ^ (string_of_int g_state.pot));
 							() (* -g_state.c_player_bet *)
 		(* if a player matches, the bet is added to the pot (can be 0) *)
 		| bet when bet + (Array.get g_state.bets (g_state.c_player)) = g_state.current_bet -> 
 								g_state.pot <- g_state.pot+bet;
+								Array.set g_state.bets (g_state.c_player) g_state.current_bet;
 								print_endline ("The pot is " ^ (string_of_int g_state.pot)); () 
 								(* -g_state.bets c_player_bet *)
 		(* if a player decides not to bet, they fold *)

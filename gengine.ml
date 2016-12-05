@@ -553,6 +553,8 @@ module Game_Engine = struct
 	(* [get_state ()] returns the global_state reference, state *)
 	let get_state () : global_state ref = state 
 
+
+
 	(* [signal_bet g_state] signals bets to the players. 
 	 * Takes in the current_st [g_state], makes necessary updates to g_state,
 	 * and then returns unit *)
@@ -630,7 +632,7 @@ module Game_Engine = struct
 					; ()
 		(* this means the player folds *)
 		(* if negative # or # less than bet, retry *)
-		| _ -> print_endline "invalid input received. try again"; 
+		| _ -> print_endline "Invalid input received. Please try again"; 
 							signal_bet g_state
 
 	
@@ -641,11 +643,11 @@ module Game_Engine = struct
 			| BET_ZERO | BET_ONE | BET_TWO | BET_THREE ->
 				if Array.get g_state.players_in g_state.c_player 
 					then signal_bet g_state else (); 
-				g_state.c_player <- (g_state.c_player + 1) mod g_state.n_players;
 				(while not (g_state.c_player = index_of_max g_state.bets) do 
+					g_state.c_player <- (g_state.c_player + 1) 
+													mod g_state.n_players;
 					if Array.get g_state.players_in g_state.c_player 
-						then signal_bet g_state else (); 
-					g_state.c_player <- (g_state.c_player + 1) mod g_state.n_players; 
+						then signal_bet g_state else ();  
 				done);
 				g_state.c_player <- 0;
 				transition_state g_state;

@@ -5,6 +5,10 @@ open Types
  * Labltk. The type definitions are subject to change. *)
 module GU_Poker : sig
 
+	val bet_amt : int ref
+
+	val get_num : unit -> int
+
 	(* Draws main window for the game *)
 	val draw_start : unit -> unit
 
@@ -15,12 +19,14 @@ module GU_Poker : sig
 	 * user to enter the number of players *)
 	val draw_n_players : unit -> unit
 
-	(* Sends the number of players to the GUI, indicating
-	 * that the user has started the game *)
-	val init_game : int -> unit
+	(* Close Graphics Window *)
+	val closeg : unit -> unit
+
+	(* Functions for the user to play the game *)
+	val player_home : card -> card -> int -> int -> int -> card list -> unit
 
 	(* Draws players hand *)
-	val draw_cards : rank * suit -> rank * suit -> unit
+	val draw_cards : rank * suit -> rank * suit -> int -> unit
 
 	(* Indicates the player has folded *)
 	val draw_fold : unit -> unit
@@ -28,11 +34,8 @@ module GU_Poker : sig
 	(* Draws the Flop *)
 	val draw_flop : unit -> unit
 
-	(* Draws the turn *)
-	val draw_turn : unit -> unit
-
-	(* Draws the river *)
-	val draw_river : unit -> unit
+	(* Draws the call *)
+	val draw_call : unit -> unit
 
 	(* Draws the win box if you win *)
 	val draw_w : unit -> unit

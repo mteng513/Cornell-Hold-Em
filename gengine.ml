@@ -1,9 +1,11 @@
 open Types
 open Opponent
+open GUpoker
 (* ml file for the Game Engine *)
 
 module Game_Engine = struct
   open Opponent
+  open GU_Poker
   exception GameEnded
 
   (* End of type declarations. We will now declare some references that
@@ -561,9 +563,11 @@ module Game_Engine = struct
     let decide_score = if (List.length g_state.cards_in_play) >= 3 
       then (score_calculation ((List.nth g_state.hands g_state.c_player)
                   @(g_state.cards_in_play)))     else 0 in
-    let bet = if g_state.c_player = 0 then read_int () 
+    let bet = if g_state.c_player = 0 then (player_home
+    (List.nth (List.nth g_state.hands 0) 0)
+    (List.nth (List.nth g_state.hands 0) 1) g_state.pot
+    (g_state.chips.(0)) g_state.current_bet g_state.cards_in_play; !bet_amt)
     else decide g_state decide_score in
-    (* let bet = read_int () in *)
     print_endline ("THE BET IS: " ^ (string_of_int bet));
     (* must make every other player match the bet, raise, or fold *)
     match bet with
@@ -633,21 +637,21 @@ module Game_Engine = struct
   (* [switch g_state] is called in after deal and each bet stage to signal bets
    * to all the players. Takes in global_state [g_state], returns unit *)
   let switch (g_state : global_state) : unit = 
-    match g_state.current_st with 
-      | BET_ZERO | BET_ONE | BET_TWO | BET_THREE ->
-          (if Array.get g_state.players_in g_state.c_player then
-          signal_bet g_state else ()); 
-          g_state.c_player <- (g_state.c_player + 1) 
-                          mod g_state.n_players;
-        (while not (g_state.c_player = index_of_max g_state.bets) do 
-          (if Array.get g_state.players_in g_state.c_player then
-          signal_bet g_state else ());   
-          g_state.c_player <- (g_state.c_player + 1) 
-                          mod g_state.n_players;
-        done);
-        g_state.c_player <- 0;
-        transition_state g_state;
-      | _ -> failwith "Bad state"
+      match g_state.current_st with 
+        | BET_ZERO | BET_ONE | BET_TWO | BET_THREE ->
+            (if Array.get g_state.players_in g_state.c_player then
+            signal_bet g_state else ()); 
+            g_state.c_player <- (g_state.c_player + 1) 
+                            mod g_state.n_players;
+          (while not (g_state.c_player = index_of_max g_state.bets) do 
+            (if Array.get g_state.players_in g_state.c_player then
+            signal_bet g_state else ());   
+            g_state.c_player <- (g_state.c_player + 1) 
+                            mod g_state.n_players;
+          done);
+          g_state.c_player <- 0;
+          transition_state g_state;
+        | _ -> failwith "Bad state"
 
   (* [deal g_state deck] takes in the current_st [g_state] and the current 
    * deck ref [deck] and updates the state with the hands. returns unit *)
@@ -806,10 +810,8 @@ module Game_Engine = struct
        * no bets. Read in number of players. *)
       print_endline ("Welcome to Cornell Hold'Em! Enter the number of people 
               you'd like in the game. No more than 8, no less than 2!");
-      let input_int = read_int () in
-      let players = if input_int > 8 || input_int < 2 
-          then (print_endline ("Idiot."); 8) 
-        else input_int in
+      draw_start ();
+      let players = get_num () in
       !state.n_players <- players;
       !state.bets <- Array.make players 0;
       !state.chips <- Array.make players 5000;

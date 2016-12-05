@@ -1,4 +1,5 @@
 (* Ml file for opponent *)
+open Types
 open Player
 open Gengine
 

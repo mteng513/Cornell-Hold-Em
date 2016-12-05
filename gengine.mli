@@ -1,37 +1,10 @@
+open Types
 (* Main interface file for the game engine. This is just a rough
  * sketch of what we think the game engine is going to look like.
  * It is entirely possible that this (and others) interface will
  * be modified heavily *)
 
 module Game_Engine : sig
-
-	type suit = Clarkson | Gries | Dijkstra | George
-
-	type rank = Two | Three | Four | Five | Six | Seven
-		| Eight | Nine | Ten | Jack | Queen | King | Ace
-
-	type card = rank * suit
-
-	type deck = card list  
-
-	type hand = card list
-
-	type current_state = START | DEAL | BET_ZERO | BET_ONE | BET_TWO | BET_THREE | SCORE
-		| END
-
-	type global_state = {
-		mutable current_st : current_state;
-		mutable cards_in_play : card list;
-		mutable pot : int;
-		mutable current_bet : int;
-		mutable n_players : int;
-		mutable c_player : int;
-		mutable hands : hand list; 
-		mutable bets : int array;
-		mutable players_in : bool array;
-		mutable scores: int array;
-		mutable chips: int array
-	}
 
 	(* Switch function - performs the transition from player to player
 	 * in the betting rounds by sending signals to the players that it

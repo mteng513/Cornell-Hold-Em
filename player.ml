@@ -1,4 +1,5 @@
 (* Ml file for the player *)
+open Types
 open Gengine
 
 module Player = struct

@@ -1,4 +1,5 @@
 (* Main test file for the Texas Hold'em Suite *)
+open Types
 open OUnit2
 open Gengine
 open Player
@@ -19,7 +20,7 @@ module Test_Game_Engine = struct
 
 	module GEngine = Game_Engine
 
-	let test_state = {GEngine.current_st = START; 
+	let test_state = {current_st = START; 
 		cards_in_play = [(Ace, Gries); (Two, Gries);
 			(Three, Clarkson); (Queen, Gries); (King, Gries)];
 		pot = 9438294;
@@ -31,7 +32,7 @@ module Test_Game_Engine = struct
 		scores = [|0;0;0;0;0;0;0;0|];
 		chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
-	let test_state_after = {GEngine.current_st = START; 
+	let test_state_after = {current_st = START; 
 		cards_in_play = [(Ace, Gries); (Two, Gries);
 			(Three, Clarkson); (Queen, Gries); (King, Gries)]; 
 		pot = 9438294;
@@ -43,7 +44,7 @@ module Test_Game_Engine = struct
  		scores = [|1000000000; 1401312; 2322; 0; 0; 0; 0; 0|];
  		chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
- 	let test_b = {GEngine.current_st = START;                                                                                                                                                       
+ 	let test_b = {current_st = START;                                                                                                                                                       
    	cards_in_play = [(Nine, George); (Ace, Dijkstra);
    	(Three, Clarkson); (Eight, Dijkstra); (Jack, Gries)];
    	pot = 100000; 
@@ -55,7 +56,7 @@ module Test_Game_Engine = struct
    	scores = [|0; 0; 0; 0; 0; 0; 0; 0|];
    	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
-   	let test_b_after = {GEngine.current_st = START; 
+   	let test_b_after = {current_st = START; 
    		cards_in_play = [(Nine, George); (Ace, Dijkstra);
    			(Three, Clarkson); (Eight, Dijkstra); (Jack, Gries)];
  		pot = 100000; 
@@ -67,7 +68,7 @@ module Test_Game_Engine = struct
  		scores = [|15000011; 22419; 0; 0; 0; 0; 0; 0|];
  		chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
- 	let test_c = {GEngine.current_st = START;                                                                                                                                                       
+ 	let test_c = {current_st = START;                                                                                                                                                       
    	cards_in_play = [(Jack, Gries); (Queen, Gries);
    	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
    	pot = 100000; 
@@ -79,7 +80,7 @@ module Test_Game_Engine = struct
    	scores = [|0; 0; 0; 0; 0; 0; 0; 0|];
    	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
-  let test_c_after = {GEngine.current_st = START;                                                                                                                                                       
+  let test_c_after = {current_st = START;                                                                                                                                                       
    	cards_in_play = [(Jack, Gries); (Queen, Gries);
    	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
    	pot = 100000; 
@@ -91,7 +92,7 @@ module Test_Game_Engine = struct
    	scores = [|1000000000; 3001312; 0; 0; 0; 0; 0; 0|];
    	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
-  let test_d = {GEngine.current_st = START;                                                                                                                                                       
+  let test_d = {current_st = START;                                                                                                                                                       
    	cards_in_play = [(Jack, Gries); (Queen, Gries);
    	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
    	pot = 100000; 
@@ -104,7 +105,7 @@ module Test_Game_Engine = struct
    	scores = [|0; 0; 0; 0; 0; 0; 0; 0|];
    	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
-  let test_d_after = {GEngine.current_st = START;                                                                                                                                                       
+  let test_d_after = {current_st = START;                                                                                                                                                       
    	cards_in_play = [(Jack, Gries); (Queen, Gries);
    	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
    	pot = 100000; 
@@ -117,7 +118,7 @@ module Test_Game_Engine = struct
    	scores = [|1000000000; 3001312; 16143194; 0; 0; 0; 0; 0|];
    	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
-  let test_e = {GEngine.current_st = START;                                                                                                                                                       
+  let test_e = {current_st = START;                                                                                                                                                       
    	cards_in_play = [(Jack, Gries); (Queen, Gries);
    	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
    	pot = 100000; 
@@ -131,7 +132,7 @@ module Test_Game_Engine = struct
    	scores = [|0; 0; 0; 0; 0; 0; 0; 0|];
    	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
-  let test_e_after = {GEngine.current_st = START;                                                                                                                                                       
+  let test_e_after = {current_st = START;                                                                                                                                                       
    	cards_in_play = [(Jack, Gries); (Queen, Gries);
    	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
    	pot = 100000; 
@@ -145,7 +146,7 @@ module Test_Game_Engine = struct
    	scores = [|1000000000; 3001312; 16143194; 1100813; 0; 0; 0; 0|];
    	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
-  let test_f = {GEngine.current_st = START;                                                                                                                                                       
+  let test_f = {current_st = START;                                                                                                                                                       
    	cards_in_play = [(Jack, Gries); (Queen, Gries);
    	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
    	pot = 100000; 
@@ -160,7 +161,7 @@ module Test_Game_Engine = struct
    	scores = [|0; 0; 0; 0; 0; 0; 0; 0|];
    	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
-  let test_f_after = {GEngine.current_st = START;                                                                                                                                                       
+  let test_f_after = {current_st = START;                                                                                                                                                       
    	cards_in_play = [(Jack, Gries); (Queen, Gries);
    	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
    	pot = 100000; 
@@ -175,7 +176,7 @@ module Test_Game_Engine = struct
    	scores = [|1000000000; 3001312; 16143194; 1100813; 19418; 0; 0; 0|];
    	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
-  let test_g = {GEngine.current_st = START;                                                                                                                                                       
+  let test_g = {current_st = START;                                                                                                                                                       
    	cards_in_play = [(Jack, Gries); (Queen, Gries);
    	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
    	pot = 100000; 
@@ -191,7 +192,7 @@ module Test_Game_Engine = struct
    	scores = [|0; 0; 0; 0; 0; 0; 0; 0|];
    	chips =[|9999999;9999999;9999999;9999999;9999999;9999999;9999999;9999999|]}
 
-  let test_g_after = {GEngine.current_st = START;                                                                                                                                                       
+  let test_g_after = {current_st = START;                                                                                                                                                       
    	cards_in_play = [(Jack, Gries); (Queen, Gries);
    	(Three, Clarkson); (Eight, Dijkstra); (King, Gries)];
    	pot = 100000; 

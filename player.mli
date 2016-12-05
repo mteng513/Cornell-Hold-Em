@@ -1,6 +1,7 @@
 (* Main play interface, provides the betting interface that
  * will be sufficient for players, but will need to be extended
  * upon for the AI players. *)
+open Types
 open Gengine
 
 module Player : sig 

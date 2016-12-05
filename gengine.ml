@@ -580,14 +580,14 @@ module Game_Engine = struct
 		let bet = read_int () in
 		(* must make every other player match the bet, raise, or fold *)
 		match bet with
-		| bet when (bet > chips_left) && chips_left + past_bet_total > g_state.current_bet ->
-							g_state.current_bet <- chips_left;
+		| bet when ((g_state.current_bet>chips_left)||(bet > chips_left)) && chips_left + past_bet_total > g_state.current_bet ->
+							(* g_state.current_bet <- chips_left; *)
 							Array.set g_state.chips g_state.c_player 0; 
-							Array.set g_state.bets (g_state.c_player) bet;
+							Array.set g_state.bets (g_state.c_player) (*pretty sure this shouldn't be bet*) bet;
 							g_state.pot <- g_state.pot+chips_left;
 							print_endline ("The pot is " ^ (string_of_int g_state.pot));
 							()
-		| bet when (bet > chips_left) && (chips_left + past_bet_total = g_state.current_bet) -> 
+		| bet when ((g_state.current_bet>chips_left)||(bet > chips_left)) && (chips_left + past_bet_total = g_state.current_bet) -> 
 								g_state.pot <- g_state.pot+chips_left;
 								Array.set g_state.chips g_state.c_player 0;
 								Array.set g_state.bets (g_state.c_player) g_state.current_bet;
@@ -608,7 +608,7 @@ module Game_Engine = struct
 								print_endline ("The pot is " ^ (string_of_int g_state.pot)); () 
 								(* -g_state.bets c_player_bet *)
 		(* if a player decides not to bet, they fold *)
-		| bet when bet = 0 -> print_endline ("Player " ^ (string_of_int g_state.c_player)
+		| bet when (bet = 0) && (g_state.current_bet > 0) -> print_endline ("Player " ^ (string_of_int g_state.c_player)
 											^ " has folded");
 											Array.set g_state.players_in g_state.c_player false;
 											()
@@ -690,7 +690,7 @@ module Game_Engine = struct
 			match lst with 
 			|[]-> ()
 			|h::t -> 
-				if h < g_state.n_players - 1 then
+				if h <= g_state.n_players - 1 then
 					if h <> (-1) then 
 						((g_state.chips).(h) <- 
 						(g_state.pot/num_winners)+ (g_state.chips).(h); 

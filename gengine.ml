@@ -708,6 +708,15 @@ module Game_Engine = struct
 		g_state.pot <- 0;
 		g_state.current_bet <- 0
 
+	let remove_players (g_state: global_state) = 
+		(* update chips *)
+		let chip_lst = Array.to_list g_state.chips in 
+		let removed_chips = List.filter (fun x -> x <> 0) chip_lst in 
+		g_state.chips <- Array.of_list removed_chips;
+		(* update n_players *)
+		let num_in_game = List.length removed_chips in 
+		g_state.n_players <- num_in_game
+
 
 	(* [game_loop g_state] takes in the global_state [g_state] and updates it
 	 * as the game goes along. Terminates when a player has won the game
@@ -740,8 +749,7 @@ module Game_Engine = struct
 		 * not the game has ended. Score needs to allocate chips to whoever won
 		 * them. *)
 		award_chips g_state;
-
-		(* put remove_players here *)
+		remove_players g_state;
 		reinitialize_game g_state;
 		reset_deck (); shuffle (); shuffle (); shuffle (); shuffle (); shuffle () 
 

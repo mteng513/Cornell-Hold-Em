@@ -555,12 +555,12 @@ module Game_Engine = struct
 	let get_state () : global_state ref = state 
 
 
-
 	(* [signal_bet g_state] signals bets to the players. 
 	 * Takes in the current_st [g_state], makes necessary updates to g_state,
 	 * and then returns unit *)
 	let rec signal_bet (g_state : global_state) (* current_player *) = 
-		print_endline ("");
+		print_endline (""); 
+		print_endline ("PLAYER " ^ (string_of_int g_state.c_player));
 		let current_bet = g_state.current_bet in
 		print_endline ("The pot is " ^ (string_of_int g_state.pot));
 		print_endline ("The current bet is " ^(string_of_int current_bet));
@@ -569,12 +569,19 @@ module Game_Engine = struct
 		let chips_left = Array.get g_state.chips g_state.c_player in
 		print_endline ("Player " ^ (string_of_int g_state.c_player) ^ " has " ^ 
 			(string_of_int chips_left) ^ " left");
-		print_endline ("Make your bet");
+		(if g_state.c_player = 0 then (print_string ("Your hand is: "); 
+								printc (List.nth g_state.hands 0);
+								print_endline ("Make your bet")) 
+			else (print_endline ("Player " ^ (string_of_int g_state.c_player) ^ 
+					"is betting:")));
 		print_string ("> ");
+		let decide_score = if (List.length g_state.cards_in_play) >= 3 
+			then (score_calculation ((List.nth g_state.hands g_state.c_player)
+									@(g_state.cards_in_play)))     else 0 in
 		let bet = if g_state.c_player = 0 then read_int () 
-		else decide g_state (score_calculation 
-					((List.nth g_state.hands g_state.c_player)@(g_state.cards_in_play))) in
+		else decide g_state decide_score in
 		(* let bet = read_int () in *)
+		print_endline ("THE BET IS: " ^ (string_of_int bet));
 		(* must make every other player match the bet, raise, or fold *)
 		match bet with
 		| bet when (bet = 0) && ((current_bet - past_bet_total) > 0 ) -> 
@@ -645,13 +652,13 @@ module Game_Engine = struct
 	let switch (g_state : global_state) : unit = 
 		match g_state.current_st with 
 			| BET_ZERO | BET_ONE | BET_TWO | BET_THREE ->
-				if Array.get g_state.players_in g_state.c_player 
-					then signal_bet g_state else (); 
-				(while not (g_state.c_player = index_of_max g_state.bets) do 
+					signal_bet g_state; 
 					g_state.c_player <- (g_state.c_player + 1) 
 													mod g_state.n_players;
-					if Array.get g_state.players_in g_state.c_player 
-						then signal_bet g_state else ();  
+				(while not (g_state.c_player = index_of_max g_state.bets) do 
+					signal_bet g_state;  
+					g_state.c_player <- (g_state.c_player + 1) 
+													mod g_state.n_players;
 				done);
 				g_state.c_player <- 0;
 				transition_state g_state;
@@ -773,6 +780,12 @@ module Game_Engine = struct
 		switch g_state;
 
 		(* Now, we are in the score stage. *)
+		(for i = 0 to g_state.n_players - 1 do
+			if Array.get g_state.players_in i = true 
+			then (print_endline ("Player " ^ (string_of_int i) ^"'s hand:");
+				printc (List.nth g_state.hands i))
+			else ()
+		done);
 		score g_state;
 
 		(* At this point, we want to do a few thing while not touching the 
@@ -794,7 +807,7 @@ module Game_Engine = struct
       let players = read_int () in
       !state.n_players <- players;
       !state.bets <- Array.make players 0;
-      !state.chips <- Array.make players 100;
+      !state.chips <- Array.make players 5000;
       !state.scores <- Array.make players 0;
       !state.players_in <- Array.make players true;
 

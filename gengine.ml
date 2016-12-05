@@ -639,10 +639,12 @@ module Game_Engine = struct
 	let switch (g_state : global_state) : unit = 
 		match g_state.current_st with 
 			| BET_ZERO | BET_ONE | BET_TWO | BET_THREE ->
-				signal_bet g_state; 
+				if Array.get g_state.players_in g_state.c_player 
+					then signal_bet g_state else (); 
 				g_state.c_player <- (g_state.c_player + 1) mod g_state.n_players;
 				(while not (g_state.c_player = index_of_max g_state.bets) do 
-					signal_bet g_state; 
+					if Array.get g_state.players_in g_state.c_player 
+						then signal_bet g_state else (); 
 					g_state.c_player <- (g_state.c_player + 1) mod g_state.n_players; 
 				done);
 				g_state.c_player <- 0;
@@ -714,10 +716,10 @@ module Game_Engine = struct
 		award winners_list g_state
 
 	let reinitialize_game (g_state: global_state): unit =
-    g_state.bets <- Array.make g_state.n_players 0;
-    g_state.scores <- Array.make g_state.n_players 0;
-    g_state.players_in <- Array.make g_state.n_players true;
-    g_state.cards_in_play <- [];
+    	g_state.bets <- Array.make g_state.n_players 0;
+    	g_state.scores <- Array.make g_state.n_players 0;
+    	g_state.players_in <- Array.make g_state.n_players true;
+    	g_state.cards_in_play <- [];
 		g_state.hands <- [];
 		g_state.pot <- 0;
 		g_state.current_bet <- 0;

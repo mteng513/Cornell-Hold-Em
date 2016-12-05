@@ -557,8 +557,9 @@ module Game_Engine = struct
 	 * Takes in the current_st [g_state], makes necessary updates to g_state,
 	 * and then returns unit *)
 	let rec signal_bet (g_state : global_state) (* current_player *) = 
+		let current_bet = g_state.current_bet in
 		print_endline ("The pot is " ^ (string_of_int g_state.pot));
-		print_endline ("The current bet is " ^(string_of_int g_state.current_bet));
+		print_endline ("The current bet is " ^(string_of_int current_bet));
 		let past_bet_total = (Array.get g_state.bets (g_state.c_player)) in
 		print_endline ("You have bet: " ^ (string_of_int past_bet_total));
 		let chips_left = Array.get g_state.chips g_state.c_player in
@@ -569,40 +570,63 @@ module Game_Engine = struct
 		let bet = read_int () in
 		(* must make every other player match the bet, raise, or fold *)
 		match bet with
-		| bet when ((g_state.current_bet>chips_left)||(bet > chips_left)) && 
-			chips_left + past_bet_total > g_state.current_bet ->
-							Array.set g_state.chips g_state.c_player 0; 
-							Array.set g_state.bets (g_state.c_player) (*pretty sure this shouldn't be bet*) bet;
-							g_state.pot <- g_state.pot+chips_left;
-							print_endline ("The pot is " ^ (string_of_int g_state.pot));
-							()
-		| bet when ((g_state.current_bet>chips_left)||(bet > chips_left)) && 
-			(chips_left + past_bet_total = g_state.current_bet) -> 
-								g_state.pot <- g_state.pot+chips_left;
-								Array.set g_state.chips g_state.c_player 0;
-								Array.set g_state.bets (g_state.c_player) g_state.current_bet;
-								print_endline ("The pot is " ^ (string_of_int g_state.pot)); () 
-		(* if player raises, bet and pot both increase *)
-		| bet when bet + past_bet_total > g_state.current_bet -> 
-							g_state.current_bet <- bet;
-							Array.set g_state.chips g_state.c_player (chips_left - bet); 
-							Array.set g_state.bets (g_state.c_player) bet;
-							g_state.pot <- g_state.pot+bet;
-							print_endline ("The pot is " ^ (string_of_int g_state.pot));
-							() (* -g_state.c_player_bet *)
-		(* if a player matches, the bet is added to the pot (can be 0) *)
-		| bet when bet + past_bet_total = g_state.current_bet -> 
-								g_state.pot <- g_state.pot+bet;
-								Array.set g_state.chips g_state.c_player (chips_left - bet);
-								Array.set g_state.bets (g_state.c_player) g_state.current_bet;
-								print_endline ("The pot is " ^ (string_of_int g_state.pot)); () 
-								(* -g_state.bets c_player_bet *)
-		(* if a player decides not to bet, they fold *)
-		| bet when (bet = 0) && (g_state.current_bet > 0) -> 
-			print_endline ("Player " ^ (string_of_int g_state.c_player)
-											^ " has folded");
-											Array.set g_state.players_in g_state.c_player false;
-											()
+		| bet when (bet = 0) && ((current_bet - past_bet_total) > 0 ) -> 
+		(* when the player bets 0 and the bet has been raised, fold *)
+					print_endline ("Player " ^ (string_of_int g_state.c_player)
+									^ " has folded");
+					(* set its players_in value to false *)
+					Array.set g_state.players_in g_state.c_player false;
+					()
+		| bet when (bet > chips_left) && 
+							((chips_left + past_bet_total) <= current_bet) ->
+		(* when the player bets more than they have and it is not a raise *)
+					(* set player's chips value to 0 *)
+					Array.set g_state.chips g_state.c_player 0;
+					(* increase bets by what the player put in, chips left *)
+					Array.set g_state.bets g_state.c_player (past_bet_total
+															+ chips_left);
+					(* increase pot by what the player put in, chips left *)
+					g_state.pot <- g_state.pot + chips_left;
+					print_endline ("The pot is " ^ (string_of_int g_state.pot))
+					; ()
+		| bet when (bet>chips_left) && 
+								((chips_left+past_bet_total)>current_bet) ->
+		(* when the player bets more than they have and it's a raise *)
+					(* set player's chips value to 0 *)
+					Array.set g_state.chips g_state.c_player 0;
+					(* increase bets by what the player put in, chips left *)
+					Array.set g_state.bets g_state.c_player (past_bet_total
+															+chips_left);
+					(* increase pot by what the player put in, chips left *)
+					g_state.pot <- g_state.pot + chips_left;
+					(* increases current_bet *)
+					g_state.current_bet <- (chips_left + past_bet_total);
+					print_endline ("The pot is " ^ (string_of_int g_state.pot))
+					; ()
+		| bet when (bet<=chips_left) && ((bet+past_bet_total)>current_bet) ->
+		(* when bet is a valid raise*)
+					(* decrease player's chips value by bet *)
+					Array.set g_state.chips g_state.c_player (chips_left-bet);
+					(* increase bets by the amount the player bet *)
+					Array.set g_state.bets g_state.c_player (past_bet_total
+															+ bet);
+					(* increases pot by bet *)
+					g_state.pot <- g_state.pot + bet;
+					(* increases current_bet *)
+					g_state.current_bet <- (bet + past_bet_total);
+					print_endline ("The pot is " ^ (string_of_int g_state.pot))
+					; ()
+		| bet when (bet + past_bet_total) = current_bet ->
+		(* when bet is a valid match/call *)
+					(* decrease a player's chips by value of bet *)
+					Array.set g_state.chips g_state.c_player (chips_left-bet);
+					(* incease bets by the amount the player bet *)
+					Array.set g_state.bets g_state.c_player (past_bet_total
+															+ bet);
+					(* increases pot by bet *)
+					g_state.pot <- g_state.pot + bet;
+					print_endline ("The pot is " ^ (string_of_int g_state.pot))
+					; ()
 		(* this means the player folds *)
 		(* if negative # or # less than bet, retry *)
 		| _ -> print_endline "invalid input received. try again"; 

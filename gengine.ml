@@ -557,6 +557,7 @@ module Game_Engine = struct
 	 * Takes in the current_st [g_state], makes necessary updates to g_state,
 	 * and then returns unit *)
 	let rec signal_bet (g_state : global_state) (* current_player *) = 
+		print_endline ("");
 		let current_bet = g_state.current_bet in
 		print_endline ("The pot is " ^ (string_of_int g_state.pot));
 		print_endline ("The current bet is " ^(string_of_int current_bet));
@@ -774,6 +775,7 @@ module Game_Engine = struct
 		remove_players g_state;
 		reinitialize_game g_state;
 		reset_deck (); shuffle (); shuffle (); shuffle (); shuffle (); shuffle () 
+		print_endline ("End of round"); print_endline ("");
 
 	let init () = 
 		try 

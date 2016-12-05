@@ -3,13 +3,14 @@ open GdkKeysyms
 open GtkMisc
 open Gengine
 open Graphics
+open Types
 
 (* Ml file for the GUpoker *)
 module GU_Poker = struct
 
   (*Make 2D Color Array out of png file*)
   let imagearray (img: string) : int array array =
-  Png.load_as_rgb24 img [] |> Graphic_image.array_of_image;
+  Png.load_as_rgb24 img [] |> Graphic_image.array_of_image
 
   let clarksonAce = imagearray "CHoldEmImgs/Classic/c01.png"
   let clarkson2 = imagearray "CHoldEmImgs/Classic/c02.png"
@@ -69,68 +70,7 @@ module GU_Poker = struct
 
   let locale = GtkMain.Main.init ()
 
-  (* Draw difficulty box *)
-  let draw_difficulty () =
-    let difwindow = GWindow.window ~width:640 ~height:480
-                              ~title:"Choose Difficulty" () in
-    let difvbox = GPack.vbox ~packing:difwindow#add () in
-    difwindow#connect#destroy ~callback:Main.quit;
 
-    (* Menu bar *)
-    let menubar = GMenu.menu_bar ~packing:vbox#pack () in
-    let factory = new GMenu.factory menubar in
-    let accel_group = factory#accel_group in
-    let file_menu = factory#add_submenu "File" in
-
-    (* File menu *)
-    let factory = new GMenu.factory file_menu ~accel_group in
-    factory#add_item "Quit" ~key:_Q ~callback: Main.quit;
-
-
-    let diff1 = GButton.button ~label:"Easy"
-          ~packing:vbox#add () in
-    diff1#connect#clicked ~callback: (fun () -> draw_n_players ();
-    prerr_endline "Medium is the only difficult supported at this time");
-    let diff2 = GButton.button ~label:"Medium"
-          ~packing:vbox#add () in
-    diff2#connect#clicked ~callback: (fun () -> draw_n_players ());
-    let diff3 = GButton.button ~label: "Hard"
-          ~packing:vbox#add () in
-    diff3#connect#clicked ~callback: (fun () -> draw_n_players ();
-    prerr_endline "Medium is the only difficult supported at this time");
-
-
-  (* Draw number of players box that will allow the
-   * user to enter the number of players *)
-  let draw_n_players () =
-
-    let opp1 = GButton.button ~label:"vs 1 CPU"
-          ~packing:vbox#add () in
-    opp1#connect#clicked ~callback: (fun () -> init_game 1);
-    let opp2 = GButton.button ~label:"vs 2 CPUs"
-          ~packing:vbox#add () in
-    opp2#connect#clicked ~callback: (fun () -> init_game 2);
-    let opp3 = GButton.button ~label: "vs 3 CPUs"
-          ~packing:vbox#add () in
-    opp3#connect#clicked ~callback: (fun () -> init_game 3);
-    let opp4 = GButton.button ~label:"vs 4 CPUs"
-          ~packing:vbox#add () in
-    opp4#connect#clicked ~callback: (fun () -> init_game 4);
-    let opp5 = GButton.button ~label:"vs 5 CPUs"
-          ~packing:vbox#add () in
-    opp5#connect#clicked ~callback: (fun () -> init_game 5);
-    let opp6 = GButton.button ~label: "vs 6 CPUs"
-          ~packing:vbox#add () in
-    opp6#connect#clicked ~callback: (fun () -> init_game 6);
-    let opp7 = GButton.button ~label:"vs 7 CPUs"
-          ~packing:vbox#add () in
-    opp7#connect#clicked ~callback: (fun () -> init_game 7);
-
-  (* Sends the number of players to the GUI, indicating
-   * that the user has started the game *)
-  let init_game i =
-   (* Engine.init (); *)
-    player_home ();
 
   let rec choose_bet () =
     let x = ref 0 in
@@ -235,16 +175,16 @@ module GU_Poker = struct
     | (King, George) -> georgeKing
   in let leftcard = card_image lt in let rightcard = card_image rt in
   Graphics.open_graph " 308x213";
-  Graphics.draw_image (Graphics.make_image lt) 0 0;
-  Graphics.draw_image (Graphics.make_image rt) 154 0
+  Graphics.draw_image (Graphics.make_image leftcard) 0 0;
+  Graphics.draw_image (Graphics.make_image rightcard) 154 0
 
   (* Draws table happenings. Takes in the new amount in
    * the pot, current number of opponents, cards in play,
         . *)
 let draw_table amt opp cards =
     Graphics.open_graph " 800x600";
-    Graphics.draw_image (Graphics.make_image table1) 125 260;
-    Graphics.draw_string ("CURRENT POT : " ^
+    (* Graphics.draw_image (Graphics.make_image ) 125 260;
+     *)Graphics.draw_string ("CURRENT POT : " ^
       (string_of_int amt) ^ "   OPPONENTS LEFT= " ^ (string_of_int opp));
     match cards with
     | h1::h2::h3::h4::h5::[] ->
@@ -333,6 +273,91 @@ let draw_table amt opp cards =
   (* Draws lose if you lose the whole game *)
   let draw_lose () =
     failwith "Unimplemented"
+
+   (* Sends the number of players to the GUI, indicating
+   * that the user has started the game *)
+  let init_game i =
+   (* Engine.init (); *)
+    player_home ()
+
+  (* Draw number of players box that will allow the
+   * user to enter the number of players *)
+
+let draw_n_players () =
+    let difwindow = GWindow.window ~width:640 ~height:480
+                              ~title:"Choose Number of Opponents" () in
+    let difvbox = GPack.vbox ~packing:difwindow#add () in
+    difwindow#connect#destroy ~callback:Main.quit;
+
+    (* Menu bar *)
+    let menubar = GMenu.menu_bar ~packing:difvbox#pack () in
+    let factory = new GMenu.factory menubar in
+    let accel_group = factory#accel_group in
+    let file_menu = factory#add_submenu "File" in
+
+      (* File menu *)
+    let factory = new GMenu.factory file_menu ~accel_group in
+    factory#add_item "Quit" ~key:_Q ~callback: Main.quit;
+
+    let opp1 = GButton.button ~label:"vs 1 CPU"
+          ~packing:difvbox#add () in
+    opp1#connect#clicked ~callback: (fun () -> difwindow#destroy (); init_game 1);
+    let opp2 = GButton.button ~label:"vs 2 CPUs"
+          ~packing:difvbox#add () in
+    opp2#connect#clicked ~callback: (fun () -> difwindow#destroy (); init_game 2);
+    let opp3 = GButton.button ~label: "vs 3 CPUs"
+          ~packing:difvbox#add () in
+    opp3#connect#clicked ~callback: (fun () -> difwindow#destroy (); init_game 3);
+    let opp4 = GButton.button ~label:"vs 4 CPUs"
+          ~packing:difvbox#add () in
+    opp4#connect#clicked ~callback: (fun () -> difwindow#destroy (); init_game 4);
+    let opp5 = GButton.button ~label:"vs 5 CPUs"
+          ~packing:difvbox#add () in
+    opp5#connect#clicked ~callback: (fun () -> difwindow#destroy (); init_game 5);
+    let opp6 = GButton.button ~label: "vs 6 CPUs"
+          ~packing:difvbox#add () in
+    opp6#connect#clicked ~callback: (fun () -> difwindow#destroy (); init_game 6);
+    let opp7 = GButton.button ~label:"vs 7 CPUs"
+          ~packing:difvbox#add () in
+    opp7#connect#clicked ~callback: (fun () -> difwindow#destroy (); init_game 7);
+
+    difwindow#add_accel_group accel_group;
+    difwindow#show ();
+    Main.main ()
+
+  (* Draw difficulty box *)
+  let draw_difficulty () =
+   let difwindow = GWindow.window ~width:640 ~height:480
+                              ~title:"Choose Difficulty" () in
+    let difvbox = GPack.vbox ~packing:difwindow#add () in
+    difwindow#connect#destroy ~callback:Main.quit;
+
+    (* Menu bar *)
+    let menubar = GMenu.menu_bar ~packing:difvbox#pack () in
+    let factory = new GMenu.factory menubar in
+    let accel_group = factory#accel_group in
+    let file_menu = factory#add_submenu "File" in
+
+      (* File menu *)
+    let factory = new GMenu.factory file_menu ~accel_group in
+    factory#add_item "Quit" ~key:_Q ~callback: Main.quit;
+
+    let diff1 = GButton.button ~label:"Easy"
+      ~packing:difvbox#add () in
+    diff1#connect#clicked ~callback: (fun () -> difwindow#destroy (); draw_n_players ();
+    prerr_endline "Medium is the only difficult supported at this time");
+    let diff2 = GButton.button ~label:"Medium"
+      ~packing:difvbox#add () in
+    diff2#connect#clicked ~callback: (fun () -> difwindow#destroy (); draw_n_players ());
+    let diff3 = GButton.button ~label: "Hard"
+      ~packing:difvbox#add () in
+    diff3#connect#clicked ~callback: (fun () -> difwindow#destroy (); draw_n_players ();
+    prerr_endline "Medium is the only difficult supported at this time");
+
+    difwindow#add_accel_group accel_group;
+    difwindow#show ();
+    Main.main ()
+
 
   (* Draws main window for the game *)
   let draw_start () =

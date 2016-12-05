@@ -699,6 +699,15 @@ module Game_Engine = struct
 				in 
 		award winners_list g_state
 
+	let reinitialize_game (g_state: global_state): unit =
+        g_state.bets <- Array.make g_state.n_players 0;
+        g_state.scores <- Array.make g_state.n_players 0;
+        g_state.players_in <- Array.make g_state.n_players true;
+        g_state.cards_in_play <- [];
+		g_state.hands <- [];
+		g_state.pot <- 0;
+		g_state.current_bet <- 0
+
 
 	(* [game_loop g_state] takes in the global_state [g_state] and updates it
 	 * as the game goes along. Terminates when a player has won the game
@@ -730,13 +739,11 @@ module Game_Engine = struct
 		 * state since the outter loop will need it to determine whether or 
 		 * not the game has ended. Score needs to allocate chips to whoever won
 		 * them. *)
-		 award_chips g_state;
-		 g_state.cards_in_play <- [];
-		 g_state.hands <- [];
-		 g_state.pot <- 0;
-		 g_state.current_bet <- 0;
+		award_chips g_state;
 
-		 reset_deck (); shuffle (); shuffle (); shuffle (); shuffle (); shuffle () 
+		(* put remove_players here *)
+		reinitialize_game g_state;
+		reset_deck (); shuffle (); shuffle (); shuffle (); shuffle (); shuffle () 
 
 	let init () = 
 		try 

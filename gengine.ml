@@ -580,6 +580,18 @@ module Game_Engine = struct
 		let bet = read_int () in
 		(* must make every other player match the bet, raise, or fold *)
 		match bet with
+		| bet when (bet > chips_left) && chips_left + past_bet_total > g_state.current_bet ->
+							g_state.current_bet <- chips_left;
+							Array.set g_state.chips g_state.c_player 0; 
+							Array.set g_state.bets (g_state.c_player) bet;
+							g_state.pot <- g_state.pot+chips_left;
+							print_endline ("The pot is " ^ (string_of_int g_state.pot));
+							()
+		| bet when (bet > chips_left) && (chips_left + past_bet_total = g_state.current_bet) -> 
+								g_state.pot <- g_state.pot+chips_left;
+								Array.set g_state.chips g_state.c_player 0;
+								Array.set g_state.bets (g_state.c_player) g_state.current_bet;
+								print_endline ("The pot is " ^ (string_of_int g_state.pot)); () 
 		(* if player raises, bet and pot both increase *)
 		| bet when bet + past_bet_total > g_state.current_bet -> 
 							g_state.current_bet <- bet;
@@ -600,18 +612,7 @@ module Game_Engine = struct
 											^ " has folded");
 											Array.set g_state.players_in g_state.c_player false;
 											()
-		| bet when (bet > chips_left) && chips_left + past_bet_total > g_state.current_bet ->
-							g_state.current_bet <- chips_left;
-							Array.set g_state.chips g_state.c_player 0; 
-							Array.set g_state.bets (g_state.c_player) bet;
-							g_state.pot <- g_state.pot+bet;
-							print_endline ("The pot is " ^ (string_of_int g_state.pot));
-							()
-		| bet when (bet > chips_left) && (chips_left + past_bet_total = g_state.current_bet) -> 
-								g_state.pot <- g_state.pot+chips_left;
-								Array.set g_state.chips g_state.c_player 0;
-								Array.set g_state.bets (g_state.c_player) g_state.current_bet;
-								print_endline ("The pot is " ^ (string_of_int g_state.pot)); () 
+		
 
 
 
@@ -711,7 +712,7 @@ module Game_Engine = struct
 	let remove_players (g_state: global_state) = 
 		(* update chips *)
 		let chip_lst = Array.to_list g_state.chips in 
-		let removed_chips = List.filter (fun x -> x <> 0) chip_lst in 
+		let removed_chips = List.filter (fun x -> x <> 0 || x < 0) chip_lst in 
 		g_state.chips <- Array.of_list removed_chips;
 		(* update n_players *)
 		let num_in_game = List.length removed_chips in 

@@ -573,7 +573,7 @@ module Game_Engine = struct
 								printc (List.nth g_state.hands 0);
 								print_endline ("Make your bet")) 
 			else (print_endline ("Player " ^ (string_of_int g_state.c_player) ^ 
-					"is betting:")));
+					" is betting:")));
 		print_string ("> ");
 		let decide_score = if (List.length g_state.cards_in_play) >= 3 
 			then (score_calculation ((List.nth g_state.hands g_state.c_player)
@@ -751,8 +751,9 @@ module Game_Engine = struct
 			raise GameEnded
 
 	let end_message (g_state: global_state) = 
+		print_endline("-----------------------------End of the Game");
 		if (Array.get g_state.chips 0 = 0) then 
-			print_endline "You lost! Play Again?"
+			print_endline "You lost! Type 'make play' to play again"
 		else 
 			print_endline "Congratulations on winning!"
 
@@ -765,24 +766,39 @@ module Game_Engine = struct
 		deal g_state deck; 
 
 		(* Bet after dealing. BET_ZERO state, transition to flop *)
+		print_endline("-----------------------------Start of Initial Bet");
 		switch g_state;
-
+		print_endline("-----------------------------Finishing Initial Bet");
+		print_endline("");
 		(* FOR NOW: Deal flop, then bet (taken care of in flop). Move on to turn *)
+		print_endline("-----------------------------Start of Flop");
 		flop g_state;
 		switch g_state;
-
+		print_endline("-----------------------------Finishing Flop Betting");
+		print_endline("");
 		(* Drop the turn, bet. *)
+		print_endline("-----------------------------Start of Turn");
 		turn g_state;
 		switch g_state;
+		print_endline("-----------------------------Finishing Turn Betting");
+		print_endline("");
 
 		(* Drop the river, bet. *)
+		print_endline("-----------------------------Start of River");
 		river g_state;
 		switch g_state;
+		print_endline("-----------------------------Finishing River Betting");
+		print_endline("");
 
 		(* Now, we are in the score stage. *)
+		print_endline("-----------------------------Final Results");
+		print_endline("");
+		print_endline("The cards in play:");
+		printc (g_state.cards_in_play);
 		(for i = 0 to g_state.n_players - 1 do
 			if Array.get g_state.players_in i = true 
-			then (print_endline ("Player " ^ (string_of_int i) ^"'s hand:");
+			then (print_endline ("");
+				print_endline ("Player " ^ (string_of_int i) ^"'s hand:");
 				printc (List.nth g_state.hands i))
 			else ()
 		done);
@@ -796,15 +812,19 @@ module Game_Engine = struct
 		remove_players g_state;
 		reinitialize_game g_state;
 		reset_deck (); shuffle (); shuffle (); shuffle (); shuffle (); shuffle (); 
-		print_endline ("End of round"); print_endline ("")
+		print_endline("-----------------------------End of the Round");
+		print_endline ("")
 
 	let init () = 
 		try 
 			(* Initial state is set to Start. There are no players, no cards,
        * no bets. Read in number of players. *)
-      print_endline ("Welcome to Cornell Hold'Em! Enter the number of 
-      players you'd like to play with.");
-      let players = read_int () in
+      print_endline ("Welcome to Cornell Hold'Em! Enter the number of people 
+      				you'd like in the game. No more than 8, no less than 2!");
+      let input_int = read_int () in
+      let players = if input_int > 8 || input_int < 2 
+      		then (print_endline ("Idiot."); 8) 
+  			else input_int in
       !state.n_players <- players;
       !state.bets <- Array.make players 0;
       !state.chips <- Array.make players 5000;

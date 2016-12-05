@@ -211,16 +211,7 @@ module Game_Engine = struct
 
 	(* Computes the max of 4 numbers. *)
   	let four_max a b c d = 
-	  	let max = ref a in 
-	    if (b > !max) then 
-	        max := b else  
-	    if (c > !max) then 
-	        max := c else 
-	    if (d > !max) then 
-	        max := d
-	    else (failwith "Failure: four_max");
-	 		!max
-
+	  	max (max a b) (max c d)
 
  	(* Returns true if there is a flush or there is a high possibility 
  	 * of a flush. *)
@@ -236,8 +227,6 @@ module Game_Engine = struct
 	  	let best_suit = four_max !c1 !c2 !c3 !c4 in 
 	  	best_suit = 5
 	  	
-
-
 	(* [flush hand] takes in a hand [hand],
 	 * Returns the sorted card list, in ascending order of rank,
 	 * containing the flush if there is one (may exceed 5 cards if 6 or all cards have same suit).

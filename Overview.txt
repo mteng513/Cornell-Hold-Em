@@ -1,0 +1,356 @@
+CS 3110 Final Project Overview Document (MS2 Implementation)
+
+Team Members:
+Will Ronchetti <wrr33>; Mike Wang <mgw55>; Matt Teng <mgt42>; 
+Oseoba Airewele <oba4>
+
+Citations:
+
+We modeled our GUI code based off of lablgtk and Graphics module examples
+in addition to using Chirag et Al's Poke Snowdown GUI as a reference. They
+built an amazing GUI for that project, and looking through how they did it
+was a huge help to us. We did not directly use any code from Poke Snowdown, 
+but did use it as a reference. We used setup code from lablgtk's simple example
+to get us started.
+
+Summary - Cornell Hold’em Engine
+
+Our Project is a play on Texas Hold’Em, with new cards. The system 
+consists of three main components: the game engine, the opponent, 
+and the GUI. We support anywhere from 2-8 players, where one of those 
+players is a human and the rest are CPU’s. During the design phase, we 
+had two extensions in mind. We wanted a GUI, and we wanted people to be 
+able to play against each other. We were able to implement the GUI, but 
+were not able to allow humans to play against each other. We also were 
+not able to implement difficulty levels for the CPU’s. The AI we did 
+implement though is pretty smart and has a large degree of randomness
+built into it, and thus is difficult to predict.
+
+
+Specification, Design and Implementation
+
+
+This project is our own, thus the whole thing is specified by us. We
+built the Game using a basic client-server model. The player interacts
+with the engine through the betting mechanism until all the other players
+have been eliminated or the player loses.
+
+There are three main modules in engine, each of which are specified in
+their respective .mli files. We will go into some further detail on each
+one here.
+
+	- types.ml
+
+		This is a separate file that contains types that all modules need
+		access to, such as the ranks, suits, cards, and global state.
+
+	- gengine.ml 
+
+		This file is the engine of our game. It contains nearly all of our
+		logic to run the game, including game states, shuffling, dealing,
+		revealing cards, scoring, selecting winners, allocating chips and
+		maintaining the game loop.
+
+	- opponent.ml
+
+		This file contains the logic for the AI opponents. They make decisions
+		based on how good their hands are in the case that they are betting,
+		or based on how good their hand is relative to the current bet if 
+		someone else has bet.
+
+	- GUpoker.ml
+
+		This file contains code for our GUI, which is used by our mainloop in 
+		engine to run the game. It is the main point of interface for the user,
+		the engine will read input from the GUI and progress the game as 
+		necessary.
+
+Module Dependency Diagram:
+															________
+														 |Types.ml|
+															--------
+															|	
+					 	 __________				|
+					  |GUpoker.ml| <----|	
+					   ----------				|_______________
+					   	   |						|*							|*
+					   	   |			__________				___________
+					   	   |---> |gengine.ml| ---> |opponent.ml|
+					   	   				----------				-----------
+
+Originally, we had a player interface - however, we found that it was better
+to simply keep that logic in the actual engine than to abstract it away into
+another module. We obviously did not make the greatest use of Ocaml's module
+system due to the fact that we cannot have circular dependencies. We found at
+many points that we needed things from other files, and ultimately settled on
+keeping nearly all of our core game logic in one file. This file (gengine.ml)
+is not actually all that large relatively speaking. Some ml files we've seen
+exceed well over 1000 lines, and our engine isn't quite that big, so we do not
+feel that doing most of our core logic in one file detracts from our design. 
+
+One design decision we did need to change had to do with the typing of our
+system. At first, we had all of our state logic in gengine, but found that
+we definitely needed it in all of our files. To prevent having the GUI call
+the engine (no circular dependencies), we moved all global types into a sort 
+of "global header" so to speak called types.ml. We did this so that we can
+have access to the types we need in all of our files. While abstracting away
+the implementation details of types is typically a good thing, we felt that
+doing so in this particular situation would overcomplicate our modules overall.
+
+We employ several key algorithms involving Ocaml's built in data structures. 
+In particular, we make extensive use of Ocaml's mutability features, refs, 
+arrays, and lists. Arrays are nice for variably changing global data structures
+such as keeping track of which players are in, their bets, and their chip 
+amounts. First and foremost, our scoring algorithm is complex, as scoring
+7 cards in poker is quite difficult and makes extensive use of pattern 
+matching. At a high level, the scoring algorithm looks like this.
+
+let score = 
+	0. produce a list of cards in play for each player
+	1. sort the cards by rank
+	2. check for a royal flush (award 100,000,000 points)
+	3. check for a straight and a flush (award 20,000,000 points)
+	4. check for four of a kind (award 19,000,000 points)
+	5. check for a full house (award 18,000,000 points)
+	6. check for a flush (award 16,000,000 points)
+	7. check for a straight (award 15,000,000 points)
+	8. check for 3 of a kind (award 2,000,000 points)
+	9. check for 2 pair (award 200,000 points)
+	10. check for pair (award 2,000 points)
+	11. compute high card value
+
+At each point, the scoring algorithm will end as soon as it hits a match
+case. Tie breakers are built into the scoring algorithm. We score the best
+5 cards. If two (or more) players score exactly the same 5 cards, they will
+split the pot evenly. The key with doing a "point" based scoring system that
+handles tie breakers is that the cards considered for the tie breaker should
+not push a hand into a higher "score range."
+
+As an example of what these pattern match cases look like, here is a simple one
+for checking pair:
+
+let pair (hand: card list) : int =
+		let pair_cards = pair_hand hand in
+		let pair_int = 
+			match pair_cards with
+			| p1::p2::[] -> make_enum_rank (fst p1)
+			| _ -> 0 
+		in
+		let card_values = 
+		make_enum_hand (sort_cards (pair_cards @ complete_pair_hand hand pair_int)) [] in
+		match card_values with
+		| h1::h2::h3::p1::p2::[] when p1 = p2 -> 1500 * p1 + 100 * h3 + 10 * h2 + h1
+		| h1::h2::p1::p2::h3::[] when p1 = p2 -> 1500 * p1 + 100 * h3 + 10 * h2 + h1
+		| h1::p1::p2::h2::h3::[] when p1 = p2 -> 1500 * p1 + 100 * h3 + 10 * h2 + h1
+		| p1::p2::h1::h2::h3::[] when p1 = p2 -> 1500 * p1 + 100 * h3 + 10 * h2 + h1
+		| _ -> 0
+
+We start by essentially enumerating our hands, matching the variant type ranks
+to numerical values we can compare and multiply. From there, we pattern match
+to locate the pair in a sorted list of cards. We locate the pair, and distribute
+points in a way that will not push pair points over the next highest hand, in
+this case 2-pair. Computing other things, especially something like a straight,
+is a good bit more complicated but follows the same basic pattern. 
+
+The next key algorithm is the game loop itself. The game loop functions as 
+follows. We start by dealing to every player marked in by the global state.
+From there, we run a betting round. After the betting round, we drop the 
+first three cards and run another betting round. We then drop the next card
+and then run another betting round. We then drop the last card and run the
+final betting round. We then compute the scores of every player still in,
+and distribute chips to the winner. We then check to see if either the 
+player has lost or all AI's have been eliminated, and if so the game ends.
+If not, the game will continue looping through the same process until a 
+winner has been decided.
+
+The next algorithm is the betting algorithm. The betting algorithm essentially
+loops through each player, prompting them to bet if they so choose. If the
+player is the human, they will be able to bet whatever they choose. If it's a
+CPU, it will run a function in the opponent interface called decide that will
+figure out whether or not to bet.
+
+There are two key situations that need to be distinguished from when it comes
+to betting. There is the situation where no one has bet, and you need to 
+decide whether or not to bet, and there is the situation where someone has bet
+and you must decide whether to call. We handle this by treating the betting
+round as if the bets were being passed around a circular table, where it loops
+until it gets back to the person who placed the highest bet. That way, everyone
+who's been looped through has either called or folded. If one chooses to raise,
+the "head" of the table is reset, and everyone must decide again.
+
+The final algorithm to describe is the CPU algorithm. We wanted to implement
+multiple difficulties, but only had time to implement one. We consider it to
+be a "medium" level difficulty because while it is not able to take into 
+account complex things, such as score potential of a hand, it is able to make
+strong pseudo-random decisions based on what they have. The algorithm is split
+into two different parts: deciding whether to bet, and deciding whether to call
+a previously placed bet. 
+
+let decide = 
+	if no bets have been placed then 
+		examine the score we have with our cards, and the scoring potential of the
+		cards we have, and bet if we have a good hand and perceive a good chance at
+		winning
+	else 
+		divide up the current bet by range, if the user bets a large amount, call 
+		with a high degree of probability as it is likely they are bluffing - if
+		its a small amount, call it under all circumstances - if its some medium
+		amount, look at what we have and decide whether to call or raise
+
+Scoring potential here involves mostly the two cards the the player is dealt.
+There are certain hands in poker you just shouldn't play, and the AI knows
+that. It will fold in many cases if they have particularly bad hands, and
+may even bet if they perceive their hand to have a very high scoring potential.
+High scoring potential hands mostly include pairs and suited high cards.
+From there, with 5 cards in play the AI will bet in random probability regions
+based on how good their hand is. If their hand is good, they'll continue to 
+bet random amounts in certain ranges. The goal of randomization is to try to
+confuse the player, that way the player cannot directly learn how good the 
+AI's hand is based on how it bets.
+
+The key idea behind the AI is to confuse the user. There is some strenghth in
+numbers here. The AI's sole goal is to beat the player, and they will work in
+similar ways to accomplish this goal by distracting and trying to trick the 
+player into making bad decisions against itself or even other AI's. The bottom
+line is that it is quite difficult to ascertain what the AI has based on what
+it bets. An AI that always bets 500 chips when it has a good hand is quite 
+predictable - this AI is not predictable in that way at all.
+
+In fact, even if you examine the source code for the AI before playing, you
+will find that it may not help you as much as you might think. The betting
+ranges are quite close together, meaning that there does not separate much
+bet value between a very good hand and a mediocre hand. This means that AI's
+who bet low values may have very strong hands, and ones that bet a lot may 
+not. This overall works to distract the player from figuring out who has 
+what. Through playtesting, we've noted that the AI plays pretty well, but
+is not perfect.
+
+The AI almost acts a bit too randomly. It needs to be a bit smarter when
+it comes to later betting stages. It's difficult to implement efficient
+algorithms for computing complex probabilities based on a given set of
+cards and knowledge of the set as whole, even a relatively small set. 
+We experimented with implementing such algorithms, but we found that the
+benefit of doing so outweighed the time that needed to be spent on it to
+develop a very strong AI. 
+
+The implementation strategy we used went as follows. We developed some parts
+of the game in isolation, but many of it was developed as a team. The only real
+exception is the GUI, which was developed in isolation and then integrated
+later on. We found that lablgtk and the graphics module had very little 
+useful documentation, so just getting the barebones GUI we have took quite a
+bit of time. We are glad we were able to implement such a thing, though. 
+
+We took a bottom up approach for implementing the game. We designed data 
+structures and built the pieces of our engine in isolation, then tested them
+for correctness, then integrated them with the rest of the game. The key thing
+that this allowed us to do was test. It's very nice to able to test individual
+parts of a system, and the way we've done this allows for exactly that.
+
+
+Testing
+
+
+Our testing strategy went as follows. Since we built each part of our engine in
+isolation, we tested each individual parts using a combination of utop and 
+Ounit testing. The part that is most conducive to OUnit testing is score 
+calculation. It's very important that our score calculation works properly, so
+we developed an extremely robust OUnit test suite for scoring. In addition to 
+testing individual scoring functions, we also tested the overall scoring 
+mechanism that updates state. The scoring functions alone are great, but they
+are a moot point if we do not properly update state and allocate chips.
+
+We were able to detect a number of minor bugs we had in scoring using our
+Ounit test suite, so we felt it was quite effective in testing the correctness
+of our scoring mechanism. In addition, it also caught problems with updating
+state as well. Locating and fixing these bugs was trivial when we had a nice
+test suite to find them for us.
+
+Aside from our Ounit test suite, we also had a seperate testing environment for
+the GUI. Most of what we did with the GUI was trial and error. There are too 
+few examples for lablgtk and graphics for us to directly apply code. We added
+a make flag for a separate guitest.ml file where we tested interacting with
+the GUI to make sure everything worked properly.
+
+In addition, as a group we logged about 6 hours of playtesting on our engine. 
+We feel that is is unlikely that we could've experienced every corner case
+possible, but were able to detect problems that were not picked up by our
+Ounit test suite that would've been difficult to see in a unit testing
+environment. While we do not test every helper function thoroughly, they
+are used in the functions we do test and feel that they do work.
+
+One of the key strengths of testing the way we did is that it allowed us to 
+have a very quick "find bug fix bug" feedback loop. We would find bugs based
+on either playtesting or our OUnit suite, and were able to fix them relatively
+quickly. It's important to be able to implement fixes very quickly, which we
+were able to do without too much trouble. We usually didn't spend more than
+10-15 minutes on any one particular bug, which is a great place to be since
+some bugs can be very tricky to find in some situations. 
+
+
+Work Plan
+
+
+Our work plan essentially revolved around the engine, the GUI, and the AI. 
+We started with the engine and the GUI. We needed to implement basic play
+between two human players before we can incorporate AI's. Once we had that
+done, we wrote the AI and integrated it into our engine. We did our best to
+spec out the project as best as we could as early as we could, that way we
+did not not need to make significant design changes midway through the 
+project. This ended up working out extremely well, as we did not at any point 
+end up completely trashing and rewriting our design at any point. Most of the
+interfaces defined in MS1 directly transferred over to MS2.
+
+Division of Labor
+
+We divided the work as follows. Oseoba was the GUI master. His job was to 
+figure out how to use lablgtk and the graphics module and help us integrate
+it into the engine. He also designed all the images for the game. He figured
+out how to build the start menu, the buttons, and integrate the images of the
+table and the cards into the game. Without Oseoba, we have no GUI.
+
+Will designed the types and interfaces, implementing much of the state and 
+game looping mechanism. These types remained relatively unchanged throughout, 
+though some changes were made. Will also did much of the work on the AI. This
+ended up being a bit of a time sink inrelation to the other parts, so Will
+helped out everywhere he could.
+
+Mike handled much of the scoring algorithm for the engine. This involved 
+designing algorithms for computing whether or not a hand fell into certain
+score categories, then assigning appropriate point ranges to the score 
+categories such that no overlap occurred. 
+
+Matt handled chip allocation and the betting mechanism. Mike would produce
+the scores, then Matt wrote algorithms to figure out who won and how to 
+allocate chips. From there, he also implemented algorithms to figure out which
+players were still in the game, and which had lost. The betting mechanism was
+an important part as well, implementing the methods by which players bet, 
+call, raise and fold.
+
+
+Known Problems
+
+
+None yet!
+
+
+Comments
+
+
+Collectively, we spent around 150 hours on this project approximately evenly
+divided amongst us all. Much of this time was spent testing and debugging. 
+We spent a good bit of time in the beginning designing, which allowed us to
+not have to heavily revisit our design later on. The actual implementation took
+the largest amount of time, probably toward the 80-90 hour range. Testing took
+much of the rest. We don't feel we needed much advice prior to starting this
+project. We were surprised to find that implementing the betting mechanism was
+one of the more difficult parts of this engine. We found that we both liked and
+disliked the open endedness of this assignment. Things that we have to spec out
+ourselves tend to be more difficult than other assignments. We did like having 
+the freedom to make our own decisions with regards to the project, though. If
+the course staff is insistent on having a final project, we don't see much to 
+change. However, perhaps compress the first two milestones a bit closer and 
+give more time to implementation. This would force us to do our design sooner
+and allow us to start implementing sooner.
+
+
+

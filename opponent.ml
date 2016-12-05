@@ -191,13 +191,100 @@ module Opponent = struct
   let sort_cards (h:hand) : hand = 
 		List.sort Pervasives.compare h
 
-	let twofifty_bet cards current_bet = failwith "TODO"
+	let twofifty_bet cards current_bet = 
+		let current_score = score_calculation cards in 
+		(* Royal Flush. Bet Everything *)
+  	if (current_score >= 100000000) then call ()
 
-	let sixhun_bet cards current_bet = failwith "TODO"
+  	(* Straight flush. Bet everything *)
+  	else if (current_score >= 20000005) then call ()
 
-	let thous_bet cards current_bet = failwith "TODO"
+  	(* Four of a kind. Bet a good amount *)
+  	else if (current_score >= 19002003) then call ()
 
-	let bluff_bet cards current_bet = failwith "TODO"
+  	(* Full House. Bet a decent amount. *)
+  	else if (current_score >= 18002003) then call ()
+
+  	(* Manual check for flush (if we are close, we should bet) *)
+  	else if ((flush cards) >= 4) then call ()
+
+  	(* Straight. Bet a decent amount. *)
+  	else if (current_score >= 15000002) then call ()
+
+  	(* 3 of a kind. Bet a decent amount *)
+  	else if (current_score >= 2000000) then call ()
+
+  	(* 2 pair. Bet a little. *)
+  	else if (current_score >= 200000) then call ()
+
+  	(* Pair. Bet a tiny bit. *)
+  	else if (current_score >= 2000) then call ()
+
+  	else fold ()
+
+	let sixhun_bet cards current_bet = 
+		let current_score = score_calculation cards in 
+		(* Royal Flush. Bet Everything *)
+  	if (current_score >= 100000000) then call ()
+
+  	(* Straight flush. Bet everything *)
+  	else if (current_score >= 20000005) then call ()
+
+  	(* Four of a kind. Bet a good amount *)
+  	else if (current_score >= 19002003) then call ()
+
+  	(* Full House. Bet a decent amount. *)
+  	else if (current_score >= 18002003) then call ()
+
+  	(* Manual check for flush (if we are close, we should bet) *)
+  	else if ((flush cards) >= 4) then call ()
+
+  	(* Straight. Bet a decent amount. *)
+  	else if (current_score >= 15000002) then call ()
+
+  	(* 3 of a kind. Bet a decent amount *)
+  	else if (current_score >= 2000000) then call ()
+
+  	(* 2 pair. Bet a little. *)
+  	else if (current_score >= 200000) then call ()
+
+  	(* Pair. Bet a tiny bit. *)
+  	else if (current_score >= 2000) then fold ()
+
+  	else fold ()
+
+	let thous_bet cards current_bet = 
+		let current_score = score_calculation cards in 
+		(* Royal Flush. Bet Everything *)
+  	if (current_score >= 100000000) then call ()
+
+  	(* Straight flush. Bet everything *)
+  	else if (current_score >= 20000005) then call ()
+
+  	(* Four of a kind. Bet a good amount *)
+  	else if (current_score >= 19002003) then call ()
+
+  	(* Full House. Bet a decent amount. *)
+  	else if (current_score >= 18002003) then call ()
+
+  	(* Manual check for flush (if we are close, we should bet) *)
+  	else if ((flush cards) >= 4) then call ()
+
+  	(* Straight. Bet a decent amount. *)
+  	else if (current_score >= 15000002) then call ()
+
+  	(* 3 of a kind. Bet a decent amount *)
+  	else if (current_score >= 2000000) then call ()
+
+  	(* 2 pair. Bet a little. *)
+  	else if (current_score >= 200000) then fold ()
+
+  	(* Pair. Bet a tiny bit. *)
+  	else if (current_score >= 2000) then fold ()
+
+  	else fold ()
+
+	let bluff_bet cards current_bet = call ()
 
   (* Secondary decision function for the second round of betting. *)
   let decide_two cards = 

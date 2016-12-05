@@ -18,7 +18,7 @@ module Player : sig
 	(* Call the amount that has currently been bet. Returns true
 	 * if bet has succesfully been called. Player will go all in
 	 * to call if need be. *)
-	val call : unit -> bool
+	val call : unit -> unit
 
 	(* Fold function that indicates that this player has folded. *)
 	val fold : unit -> unit 

@@ -689,13 +689,14 @@ module Game_Engine = struct
 		award winners_list g_state
 
 	let reinitialize_game (g_state: global_state): unit =
-        g_state.bets <- Array.make g_state.n_players 0;
-        g_state.scores <- Array.make g_state.n_players 0;
-        g_state.players_in <- Array.make g_state.n_players true;
-        g_state.cards_in_play <- [];
+    g_state.bets <- Array.make g_state.n_players 0;
+    g_state.scores <- Array.make g_state.n_players 0;
+    g_state.players_in <- Array.make g_state.n_players true;
+    g_state.cards_in_play <- [];
 		g_state.hands <- [];
 		g_state.pot <- 0;
-		g_state.current_bet <- 0
+		g_state.current_bet <- 0;
+		if (g_state.n_players = 1) then raise GameEnded else ()
 
 	let remove_players (g_state: global_state) = 
 		(* update chips *)
@@ -763,7 +764,7 @@ module Game_Engine = struct
       raise GameEnded
 
 		with 
-			| GameEnded -> ()
+			| GameEnded -> print_endline "Game Over! Thanks for playing."; ()
 			| _ -> failwith "This is bad"
 
 end 

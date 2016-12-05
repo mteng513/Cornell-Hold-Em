@@ -1,3 +1,4 @@
+open Types
 (* AI opponent module. The AI will make probabilistic
  * decisions on whether or not to bet, in an effort 
  * to deceive the player. It will still use the Player
@@ -16,7 +17,7 @@ module Opponent : sig
 	 * (unpredictable) way. The only difference between
 	 * the player and the AI is that the AI needs to make
 	 * the betting decisions. *)
-	val decide : unit -> unit
+	val decide : global_state -> int -> int
 
 
 

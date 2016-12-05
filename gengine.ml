@@ -1,8 +1,9 @@
 open Types
+open Opponent
 (* ml file for the Game Engine *)
 
 module Game_Engine = struct
-
+	open Opponent
 	exception GameEnded
 
 	(* End of type declarations. We will now declare some references that
@@ -570,7 +571,10 @@ module Game_Engine = struct
 			(string_of_int chips_left) ^ " left");
 		print_endline ("Make your bet");
 		print_string ("> ");
-		let bet = read_int () in
+		let bet = if g_state.c_player = 0 then read_int () 
+		else decide g_state (score_calculation 
+					((List.nth g_state.hands g_state.c_player)@(g_state.cards_in_play))) in
+		(* let bet = read_int () in *)
 		(* must make every other player match the bet, raise, or fold *)
 		match bet with
 		| bet when (bet = 0) && ((current_bet - past_bet_total) > 0 ) -> 
@@ -778,8 +782,8 @@ module Game_Engine = struct
 		award_chips g_state;
 		remove_players g_state;
 		reinitialize_game g_state;
-		reset_deck (); shuffle (); shuffle (); shuffle (); shuffle (); shuffle () 
-		print_endline ("End of round"); print_endline ("");
+		reset_deck (); shuffle (); shuffle (); shuffle (); shuffle (); shuffle (); 
+		print_endline ("End of round"); print_endline ("")
 
 	let init () = 
 		try 

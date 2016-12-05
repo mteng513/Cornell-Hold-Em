@@ -157,7 +157,6 @@ module Game_Engine = struct
     	(!f_list) @ (!e_list) @ (!g_list);
     cut ()
 
-
 	(* [sort_card hand] takes in a hand [hand] and returns a hand, sorted using
 	 * List.sort Pervasives.compare on the hand *)
 	let sort_cards (h:hand) : hand = 
@@ -167,7 +166,6 @@ module Game_Engine = struct
 	 * out all cards from [hand] of number [i]. Returns the filtered hand *)
 	let filter_suit (hand: hand) (i: int) : hand = 
 	List.(hand |> filter (fun x -> snd x = snd(List.nth hand i)))
-
 
 	(* BEGIN STRAIGHT CALC *)
 	(* [make_enum_rank rank] takes in [rank] of type rank and returns the int
@@ -229,8 +227,8 @@ module Game_Engine = struct
 	  	
 	(* [flush hand] takes in a hand [hand],
 	 * Returns the sorted card list, in ascending order of rank,
-	 * containing the flush if there is one (may exceed 5 cards if 6 or all cards have same suit).
-	 * Otherwise, returns the empty list.
+	 * containing the flush if there is one (may exceed 5 cards 
+	 * if 6 or all cards have same suit). Otherwise, returns the empty list.
 	 *)
 	let flush_hand (hand: card list) : card list = 
 		let h = sort_cards hand in 
@@ -244,7 +242,7 @@ module Game_Engine = struct
 			[]
 
 	let flush (hand: card list) : int =
-		let card_values = remove_duplicates (make_enum_hand (flush_hand hand) []) in
+		let card_values =remove_duplicates (make_enum_hand (flush_hand hand) []) in
 		match card_values with 
 		| _::_::a::b::c::d::e::[] -> 16000000 + e*10000 + d*1000 + c*100 + b*10 + a
 		| _::a::b::c::d::e::[] -> 16000000 + e*10000 + d*1000 + c*100 + b*10 + a
@@ -276,8 +274,9 @@ module Game_Engine = struct
 		match l with
 		| [] -> acc
 		| h::[] -> acc @ [h]
-		| h1::h2::t -> if h1 = h2 - 1 || e = h1 -1 then remove_nonconsec (h2::t) h1 (acc @ [h1])
-								else remove_nonconsec (h2::t) h1 acc
+		| h1::h2::t -> if h1 = h2 - 1 || e = h1 -1 then 
+			remove_nonconsec (h2::t) h1 (acc @ [h1])
+			else remove_nonconsec (h2::t) h1 acc
 
 	(* [straight hand] takes in a [hand] of type hand and returns the 
 	 * hand of the 5 cards making up the straight, sorted lowest to 
@@ -305,9 +304,12 @@ module Game_Engine = struct
 								if flush hand > 0 then 20000000 + e else 15000000 + e						
 		| a::b::c::d::e::_::_::[] when are_consec a b c d e -> 
 								if flush hand > 0 then 20000000 + e else 15000000 + e 
-		| 2::3::4::5::_::_::_::[] when contains_ace -> if flush hand > 0 then 20000005 else 15000005  
-		| 2::3::4::5::_::_::[] when contains_ace -> if flush hand > 0 then 20000005 else 15000005 
-		| 2::3::4::5::[] when contains_ace -> if flush hand > 0 then 20000005 else 15000005 
+		| 2::3::4::5::_::_::_::[] when contains_ace -> if flush hand > 0 
+								then 20000005 else 15000005  
+		| 2::3::4::5::_::_::[] when contains_ace -> if flush hand > 0 
+								then 20000005 else 15000005 
+		| 2::3::4::5::[] when contains_ace -> if flush hand > 0 
+								then 20000005 else 15000005 
 		| _ -> 0
 
 	(* BEGIN 4Kind 3Kind PAIR CALC *)
@@ -342,10 +344,14 @@ module Game_Engine = struct
 			| f1::f2::f3::f4::[] -> make_enum_rank (fst f1)
 			| _ -> 0 
 		in
-		let card_values = make_enum_hand (sort_cards (four_cards @ largest_unincluded_element hand other_card_int)) [] in
+		let card_values = 
+		make_enum_hand (sort_cards 
+			(four_cards @ largest_unincluded_element hand other_card_int)) [] in
 		match card_values with 
-		| h::f1::f2::f3::f4::[] when f2 = f1 && f3 = f2 && f4 = f3 -> 19000000 + f1 * 1000 + h
-		| f1::f2::f3::f4::h::[] when f2 = f1 && f3 = f2 && f4 = f3 -> 19000000 + f1 * 1000 + h
+		| h::f1::f2::f3::f4::[] when f2 = f1 && f3 = f2 && f4 = f3 -> 
+			19000000 + f1 * 1000 + h
+		| f1::f2::f3::f4::h::[] when f2 = f1 && f3 = f2 && f4 = f3 -> 
+			19000000 + f1 * 1000 + h
 		| _ -> 0
 
 
@@ -373,11 +379,15 @@ module Game_Engine = struct
 			| t1::t2::t3::[] -> make_enum_rank (fst t1)
 			| _ -> 0 
 		in
-		let card_values = make_enum_hand (sort_cards (three_cards @ complete_three_hand hand three_int)) [] in
+		let card_values = make_enum_hand (sort_cards 
+			(three_cards @ complete_three_hand hand three_int)) [] in
 		match card_values with 
-		| h1::h2::t1::t2::t3::[] when t2 = t1 && t3 = t2 -> 1000000 * t1 + 100 * h2 + h1
-		| h1::t1::t2::t3::h2::[] when t2 = t1 && t3 = t2 -> 1000000 * t1 + 100 * h2 + h1
-		| t1::t2::t3::h1::h2::[] when t2 = t1 && t3 = t2 -> 1000000 * t1 + 100 * h2 + h1
+		| h1::h2::t1::t2::t3::[] when t2 = t1 && t3 = t2 -> 
+			1000000 * t1 + 100 * h2 + h1
+		| h1::t1::t2::t3::h2::[] when t2 = t1 && t3 = t2 -> 
+			1000000 * t1 + 100 * h2 + h1
+		| t1::t2::t3::h1::h2::[] when t2 = t1 && t3 = t2 -> 
+			1000000 * t1 + 100 * h2 + h1
 		| _ -> 0
 
 	(* [pair hand] *)
@@ -395,7 +405,9 @@ module Game_Engine = struct
 	let complete_pair_hand (hand: card list) (i: int): card list =
 		let unincluded_list = sort_cards (rev_filter_card_rank hand i) in 
 		let len = List.length unincluded_list - 1 in
-		[List.nth unincluded_list (len-2); List.nth unincluded_list (len-1); List.nth unincluded_list len]
+		[List.nth unincluded_list (len-2); 
+		List.nth unincluded_list (len-1); 
+		List.nth unincluded_list len]
 
 	let pair (hand: card list) : int =
 		let pair_cards = pair_hand hand in
@@ -404,12 +416,14 @@ module Game_Engine = struct
 			| p1::p2::[] -> make_enum_rank (fst p1)
 			| _ -> 0 
 		in
-		let card_values = make_enum_hand (sort_cards (pair_cards @ complete_pair_hand hand pair_int)) [] in
+		let card_values = 
+		make_enum_hand (sort_cards 
+			(pair_cards @ complete_pair_hand hand pair_int)) [] in
 		match card_values with
-		| h1::h2::h3::p1::p2::[] when p1 = p2 -> 1500 * p1 + 100 * h3 + 10 * h2 + h1
-		| h1::h2::p1::p2::h3::[] when p1 = p2 -> 1500 * p1 + 100 * h3 + 10 * h2 + h1
-		| h1::p1::p2::h2::h3::[] when p1 = p2 -> 1500 * p1 + 100 * h3 + 10 * h2 + h1
-		| p1::p2::h1::h2::h3::[] when p1 = p2 -> 1500 * p1 + 100 * h3 + 10 * h2 + h1
+		| h1::h2::h3::p1::p2::[] when p1 = p2 -> 1500 * p1 + 100 * h3 + 10 * h2 +h1
+		| h1::h2::p1::p2::h3::[] when p1 = p2 -> 1500 * p1 + 100 * h3 + 10 * h2 +h1
+		| h1::p1::p2::h2::h3::[] when p1 = p2 -> 1500 * p1 + 100 * h3 + 10 * h2 +h1
+		| p1::p2::h1::h2::h3::[] when p1 = p2 -> 1500 * p1 + 100 * h3 + 10 * h2 +h1
 		| _ -> 0
 
 
@@ -417,13 +431,15 @@ module Game_Engine = struct
 	let two_pair_hand (hand: card list) : card list = 
 		let h = List.rev (sort_cards hand) in
 		if not (pair_hand h = []) then 
-			pair_hand h @ pair_hand (List.(h |> filter (fun x -> fst x <> fst(List.hd (pair_hand h)))))
+			pair_hand h @ pair_hand 
+				(List.(h |> filter (fun x -> fst x <> fst(List.hd (pair_hand h)))))
 		else 
 			[]
 
 	let complete_two_pair_hand (hand: card list) (ints: int*int): card list =
 		let pre_unincluded_list = (rev_filter_card_rank hand (fst ints)) in
-		let unincluded_list = sort_cards (rev_filter_card_rank pre_unincluded_list (snd ints)) in
+		let unincluded_list = 
+			sort_cards (rev_filter_card_rank pre_unincluded_list (snd ints)) in
 		let len = List.length unincluded_list - 1 in
 		[List.nth unincluded_list len]
 
@@ -435,26 +451,35 @@ module Game_Engine = struct
 			| fp1::fp2::sp1::sp2::[] -> (make_enum_rank (fst fp1), make_enum_rank (fst sp1))
 			| _ -> (0, 0)
 		in
-		let card_values = make_enum_hand (sort_cards (two_pair_hand hand @ complete_two_pair_hand hand pair_ints)) [] in
+		let card_values = 
+		make_enum_hand (sort_cards 
+			(two_pair_hand hand @ complete_two_pair_hand hand pair_ints)) [] in
 		match card_values with
-		| h::fp1::fp2::sp1::sp2::[] when fp1 = fp2 && sp1 = sp2 -> 100000 * sp1 + 100 * fp1 + h
-		| fp1::fp2::h::sp1::sp2::[] when fp1 = fp2 && sp1 = sp2 -> 100000 * sp1 + 100 * fp1 + h
-		| fp1::fp2::sp1::sp2::h::[] when fp1 = fp2 && sp1 = sp2 -> 100000 * sp1 + 100 * fp1 + h
+		| h::fp1::fp2::sp1::sp2::[] when fp1 = fp2 && sp1 = sp2 -> 
+			100000 * sp1 + 100 * fp1 + h
+		| fp1::fp2::h::sp1::sp2::[] when fp1 = fp2 && sp1 = sp2 -> 
+			100000 * sp1 + 100 * fp1 + h
+		| fp1::fp2::sp1::sp2::h::[] when fp1 = fp2 && sp1 = sp2 -> 
+			100000 * sp1 + 100 * fp1 + h
 		| _ -> 0
 
 	(* full_house [hand] *)
 	let full_house_hand (hand: card list) : card list = 
 		let h = List.rev (sort_cards hand) in 
 		if not (three_kind_hand h = []) then  
-			(three_kind_hand h) @ (pair_hand (List.(h |> filter (fun x -> fst x <> fst(List.hd (three_kind_hand h))))))
+			(three_kind_hand h) @ 
+			(pair_hand (List.(h |> filter 
+				(fun x -> fst x <> fst(List.hd (three_kind_hand h))))))
 		else 
 			[]
 
 	let full_house (hand: card list) : int =
 		let card_values = List.rev (make_enum_hand (full_house_hand hand) []) in
 		match card_values with
-		| t1::t2::t3::p1::p2::[] when t1 = t2 && t2 = t3 && p1 = p2 -> 18000000 + 1000 * t1 + p1
-		| p1::p2::t1::t2::t3::[] when t1 = t2 && t2 = t3 && p1 = p2 -> 18000000 + 1000 * t1 + p1
+		| t1::t2::t3::p1::p2::[] when t1 = t2 && t2 = t3 && p1 = p2 -> 
+			18000000 + 1000 * t1 + p1
+		| p1::p2::t1::t2::t3::[] when t1 = t2 && t2 = t3 && p1 = p2 -> 
+			18000000 + 1000 * t1 + p1
 		| _ -> 0
 
 	let high_card (hand: card list) : int =
@@ -519,7 +544,8 @@ module Game_Engine = struct
 		let p_in_list = Array.to_list (g_state.players_in) in
 		(for i = 0 to (List.length p_in_list) - 1 do
 			(if (List.nth p_in_list i) 
-			then Array.set score_array i (score_calculation ((List.nth g_state.hands i)@(g_state.cards_in_play))) 
+			then Array.set score_array i (score_calculation 
+				((List.nth g_state.hands i)@(g_state.cards_in_play))) 
 			else ());
 		done);
 		g_state.scores <- score_array
@@ -559,24 +585,26 @@ module Game_Engine = struct
 	 * and then returns unit *)
 	let rec signal_bet (g_state : global_state) (* current_player *) = 
 		print_endline ("The pot is " ^ (string_of_int g_state.pot));
-		print_endline ("The current bet is " ^ (string_of_int g_state.current_bet));
+		print_endline ("The current bet is " ^(string_of_int g_state.current_bet));
 		let past_bet_total = (Array.get g_state.bets (g_state.c_player)) in
 		print_endline ("You have bet: " ^ (string_of_int past_bet_total));
 		let chips_left = Array.get g_state.chips g_state.c_player in
-		print_endline ("Player " ^ (string_of_int g_state.c_player) ^ " has " ^ (string_of_int chips_left) ^ " left");
+		print_endline ("Player " ^ (string_of_int g_state.c_player) ^ " has " ^ 
+			(string_of_int chips_left) ^ " left");
 		print_endline ("Make your bet");
 
 		let bet = read_int () in
 		(* must make every other player match the bet, raise, or fold *)
 		match bet with
-		| bet when ((g_state.current_bet>chips_left)||(bet > chips_left)) && chips_left + past_bet_total > g_state.current_bet ->
-							(* g_state.current_bet <- chips_left; *)
+		| bet when ((g_state.current_bet>chips_left)||(bet > chips_left)) && 
+			chips_left + past_bet_total > g_state.current_bet ->
 							Array.set g_state.chips g_state.c_player 0; 
 							Array.set g_state.bets (g_state.c_player) (*pretty sure this shouldn't be bet*) bet;
 							g_state.pot <- g_state.pot+chips_left;
 							print_endline ("The pot is " ^ (string_of_int g_state.pot));
 							()
-		| bet when ((g_state.current_bet>chips_left)||(bet > chips_left)) && (chips_left + past_bet_total = g_state.current_bet) -> 
+		| bet when ((g_state.current_bet>chips_left)||(bet > chips_left)) && 
+			(chips_left + past_bet_total = g_state.current_bet) -> 
 								g_state.pot <- g_state.pot+chips_left;
 								Array.set g_state.chips g_state.c_player 0;
 								Array.set g_state.bets (g_state.c_player) g_state.current_bet;
@@ -597,22 +625,19 @@ module Game_Engine = struct
 								print_endline ("The pot is " ^ (string_of_int g_state.pot)); () 
 								(* -g_state.bets c_player_bet *)
 		(* if a player decides not to bet, they fold *)
-		| bet when (bet = 0) && (g_state.current_bet > 0) -> print_endline ("Player " ^ (string_of_int g_state.c_player)
+		| bet when (bet = 0) && (g_state.current_bet > 0) -> 
+			print_endline ("Player " ^ (string_of_int g_state.c_player)
 											^ " has folded");
 											Array.set g_state.players_in g_state.c_player false;
 											()
-		
-
-
-
 		(* this means the player folds *)
 		(* if negative # or # less than bet, retry *)
 		| _ -> print_endline "invalid input received. try again"; 
 							signal_bet g_state
 
 	
-	(* [switch g_state] is called in after deal and each bet stage to signal bets to
-	 * all the players. Takes in global_state [g_state], returns unit*)
+	(* [switch g_state] is called in after deal and each bet stage to signal bets
+	 * to all the players. Takes in global_state [g_state], returns unit *)
 	let switch (g_state : global_state) : unit = 
 		match g_state.current_st with 
 			| BET_ZERO | BET_ONE | BET_TWO | BET_THREE ->
@@ -620,7 +645,8 @@ module Game_Engine = struct
 				g_state.c_player <- (g_state.c_player + 1) mod g_state.n_players;
 				(while not (g_state.c_player = index_of_max g_state.bets) do 
 					signal_bet g_state; 
-					g_state.c_player <- (g_state.c_player + 1) mod g_state.n_players; done);
+					g_state.c_player <- (g_state.c_player + 1) mod g_state.n_players; 
+				done);
 				g_state.c_player <- 0;
 				transition_state g_state;
 			| _ -> failwith "Bad state"

@@ -565,7 +565,7 @@ module Game_Engine = struct
 		print_endline ("Player " ^ (string_of_int g_state.c_player) ^ " has " ^ 
 			(string_of_int chips_left) ^ " left");
 		print_endline ("Make your bet");
-
+		print_string ("> ");
 		let bet = read_int () in
 		(* must make every other player match the bet, raise, or fold *)
 		match bet with
@@ -700,13 +700,21 @@ module Game_Engine = struct
 
 	let remove_players (g_state: global_state) = 
 		(* update chips *)
-		let chip_lst = Array.to_list g_state.chips in 
-		let removed_chips = List.filter (fun x -> x <> 0 || x < 0) chip_lst in 
-		g_state.chips <- Array.of_list removed_chips;
-		(* update n_players *)
-		let num_in_game = List.length removed_chips in 
-		g_state.n_players <- num_in_game
+		if (g_state.chips.(0) <> 0) then
+			let chip_lst = Array.to_list g_state.chips in 
+			let removed_chips = List.filter (fun x -> x <> 0 || x < 0) chip_lst in 
+			g_state.chips <- Array.of_list removed_chips;
+			(* update n_players *)
+			let num_in_game = List.length removed_chips in 
+			g_state.n_players <- num_in_game
+		else 
+			raise GameEnded
 
+	let end_message (g_state: global_state) = 
+		if (Array.get g_state.chips 0 = 0) then 
+			print_endline "You lost! Play Again?"
+		else 
+			print_endline "Congratulations on winning!"
 
 	(* [game_loop g_state] takes in the global_state [g_state] and updates it
 	 * as the game goes along. Terminates when a player has won the game
@@ -764,7 +772,7 @@ module Game_Engine = struct
       raise GameEnded
 
 		with 
-			| GameEnded -> print_endline "Game Over! Thanks for playing."; ()
+			| GameEnded -> end_message !state
 			| _ -> failwith "This is bad"
 
 end 

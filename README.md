@@ -1,5 +1,10 @@
 # > CornellHold'Em Instructions
 
+There are two versions of this game in this repo. The one in the top level (this directory) 
+is the gui version, which requires the packages listed below. There is another in a subfolder
+that is completely text based that will run on OS's that are not Linux. There shouldn't be
+any missing dependencies from the text version.
+
 NOTE: You will need to download the 2015 3110 Course VM. Sorry, Ocaml
 Graphics doesn't work at all on Macs, and it doesn't work on the 2016
 VM either (not easily at least).

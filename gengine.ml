@@ -507,6 +507,7 @@ module Game_Engine = struct
 
 	let score_calculation (hand: card list): int =
 		match hand with
+		| [] -> 0
 		| hand when straight hand = 1000000000 -> straight hand
 		| hand when straight hand >= 20000000 -> straight hand
 		| hand when four_kind hand >= 19002000 -> four_kind hand
